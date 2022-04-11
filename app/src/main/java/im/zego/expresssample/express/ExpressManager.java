@@ -101,7 +101,9 @@ public class ExpressManager {
                     } else {
                         stopPlayStream(zegoStream.streamID);
                         WeakReference<TextureView> weakReference = streamViewMap.remove(zegoStream.streamID);
-                        weakReference.clear();
+                        if (streamViewMap != null) {
+                            weakReference.clear();
+                        }
                     }
                 }
             }
