@@ -1,4 +1,4 @@
-package im.zego.expresssample;
+package im.zego.expresssample.express;
 
 public class AppCenter {
 
