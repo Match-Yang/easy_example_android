@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
                         .request((allGranted, grantedList, deniedList) -> {
                             if (allGranted) {
                                 binding.loading.setVisibility(View.VISIBLE);
-                                loginRTCRoom(new Callback() {
+                                joinRoom(new Callback() {
                                     @Override
                                     public void onResult(int errorCode) {
                                         Log.d(TAG, "onResult() called with: errorCode = [" + errorCode + "]");
@@ -162,7 +162,7 @@ public class LoginActivity extends AppCompatActivity {
         return AppCenter.appID != 0L && !TextUtils.isEmpty(AppCenter.serverSecret);
     }
 
-    private void loginRTCRoom(Callback callback) {
+    private void joinRoom(Callback callback) {
         String username = binding.username.getText().toString();
         String roomid = binding.roomid.getText().toString();
         String userID = System.currentTimeMillis() + "";
