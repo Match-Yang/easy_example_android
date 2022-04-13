@@ -11,7 +11,7 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.permissionx.guolindev.PermissionX;
-import im.zego.expresssample.AppCenter;
+import im.zego.expresssample.express.AppCenter;
 import im.zego.expresssample.databinding.ActivityLoginBinding;
 import im.zego.expresssample.express.ExpressManager;
 import im.zego.expresssample.express.ExpressManager.Callback;
@@ -21,7 +21,6 @@ import im.zego.expresssample.express.ZegoMediaOptions;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
