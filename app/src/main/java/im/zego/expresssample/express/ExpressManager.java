@@ -6,10 +6,11 @@ import android.util.Log;
 import android.view.TextureView;
 import im.zego.zegoexpress.ZegoExpressEngine;
 import im.zego.zegoexpress.callback.IZegoEventHandler;
+import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
 import im.zego.zegoexpress.constants.ZegoPlayerState;
 import im.zego.zegoexpress.constants.ZegoPublisherState;
 import im.zego.zegoexpress.constants.ZegoRemoteDeviceState;
-import im.zego.zegoexpress.constants.ZegoRoomState;
+import im.zego.zegoexpress.constants.ZegoRoomStateChangedReason;
 import im.zego.zegoexpress.constants.ZegoScenario;
 import im.zego.zegoexpress.constants.ZegoStreamQualityLevel;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
@@ -18,6 +19,7 @@ import im.zego.zegoexpress.entity.ZegoCanvas;
 import im.zego.zegoexpress.entity.ZegoEngineConfig;
 import im.zego.zegoexpress.entity.ZegoEngineProfile;
 import im.zego.zegoexpress.entity.ZegoRoomConfig;
+import im.zego.zegoexpress.entity.ZegoRoomExtraInfo;
 import im.zego.zegoexpress.entity.ZegoStream;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.lang.ref.WeakReference;
@@ -52,7 +54,6 @@ public class ExpressManager {
     private int mediaOptions;
     private String roomID;
     private ExpressManagerHandler handler;
-    private Callback joinRoomCallback;
 
     public void createEngine(Application application, long appID) {
         ZegoEngineProfile profile = new ZegoEngineProfile();
@@ -167,17 +168,19 @@ public class ExpressManager {
             }
 
             @Override
-            public void onRoomStateUpdate(String roomID, ZegoRoomState state, int errorCode, JSONObject extendedData) {
-                super.onRoomStateUpdate(roomID, state, errorCode, extendedData);
-                Log.d(TAG,
-                    "onRoomStateUpdate() called with: roomID = [" + roomID + "], state = [" + state + "], errorCode = ["
-                        + errorCode + "], extendedData = [" + extendedData + "]");
-                if (state == ZegoRoomState.CONNECTED) {
-                    if (joinRoomCallback != null) {
-                        joinRoomCallback.onResult(errorCode);
-                        joinRoomCallback = null;
-                    }
+            public void onRoomExtraInfoUpdate(String roomID, ArrayList<ZegoRoomExtraInfo> roomExtraInfoList) {
+                super.onRoomExtraInfoUpdate(roomID, roomExtraInfoList);
+                if (handler != null) {
+                    handler.onRoomExtraInfoUpdate(roomID, roomExtraInfoList);
                 }
+            }
+
+            @Override
+            public void onRoomStateChanged(String roomID, ZegoRoomStateChangedReason reason, int errorCode,
+                JSONObject extendedData) {
+                super.onRoomStateChanged(roomID, reason, errorCode, extendedData);
+                Log.d(TAG, "onRoomStateChanged() called with: roomID = [" + roomID + "], reason = [" + reason
+                    + "], errorCode = [" + errorCode + "], extendedData = [" + extendedData + "]");
             }
 
             @Override
@@ -198,7 +201,8 @@ public class ExpressManager {
         });
     }
 
-    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions, Callback callback) {
+    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions,
+        IZegoRoomLoginCallback callback) {
         participantMap.clear();
         streamUserMap.clear();
         if (TextUtils.isEmpty(token)) {
@@ -217,7 +221,14 @@ public class ExpressManager {
         // if you need limit participant count, you can change the max member count
         config.maxMemberCount = 0;
         config.isUserStatusNotify = true;
-        ZegoExpressEngine.getEngine().loginRoom(roomID, zegoUser, config);
+        ZegoExpressEngine.getEngine().loginRoom(roomID, zegoUser, config, new IZegoRoomLoginCallback() {
+            @Override
+            public void onRoomLoginResult(int errorCode, JSONObject extendedData) {
+                if (callback != null) {
+                    callback.onRoomLoginResult(errorCode, extendedData);
+                }
+            }
+        });
 
         boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
         boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
@@ -228,7 +239,6 @@ public class ExpressManager {
             participant.mic = publishLocalAudio;
             participant.camera = publishLocalVideo;
         }
-        this.joinRoomCallback = callback;
     }
 
     public void setLocalVideoView(TextureView textureView) {
@@ -366,10 +376,7 @@ public class ExpressManager {
         void onRoomUserDeviceUpdate(ZegoDeviceUpdateType updateType, String userID, String roomID);
 
         void onRoomTokenWillExpire(String roomID, int remainTimeInSecond);
-    }
 
-    public interface Callback {
-
-        void onResult(int errorCode);
+        void onRoomExtraInfoUpdate(String roomID, ArrayList<ZegoRoomExtraInfo> roomExtraInfoList);
     }
 }

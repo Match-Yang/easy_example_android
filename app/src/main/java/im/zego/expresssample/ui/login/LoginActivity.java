@@ -11,16 +11,18 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.permissionx.guolindev.PermissionX;
-import im.zego.expresssample.express.AppCenter;
 import im.zego.expresssample.databinding.ActivityLoginBinding;
+import im.zego.expresssample.express.AppCenter;
 import im.zego.expresssample.express.ExpressManager;
-import im.zego.expresssample.express.ExpressManager.Callback;
 import im.zego.expresssample.express.ExpressManager.ExpressManagerHandler;
 import im.zego.expresssample.express.ZegoDeviceUpdateType;
 import im.zego.expresssample.express.ZegoMediaOptions;
+import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
+import im.zego.zegoexpress.entity.ZegoRoomExtraInfo;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.util.ArrayList;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -51,10 +53,11 @@ public class LoginActivity extends AppCompatActivity {
                         .request((allGranted, grantedList, deniedList) -> {
                             if (allGranted) {
                                 binding.loading.setVisibility(View.VISIBLE);
-                                joinRoom(new Callback() {
+                                joinRoom(new IZegoRoomLoginCallback() {
                                     @Override
-                                    public void onResult(int errorCode) {
-                                        Log.d(TAG, "onResult() called with: errorCode = [" + errorCode + "]");
+                                    public void onRoomLoginResult(int errorCode, JSONObject jsonObject) {
+                                        Log.d(TAG, "onRoomLoginResult() called with: errorCode = [" + errorCode
+                                            + "], jsonObject = [" + jsonObject + "]");
                                         binding.loading.setVisibility(View.GONE);
                                         if (errorCode == 0) {
                                             binding.layoutLogin.setVisibility(View.GONE);
@@ -107,6 +110,11 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onRoomTokenWillExpire(String roomID, int remainTimeInSecond) {
+
+            }
+
+            @Override
+            public void onRoomExtraInfoUpdate(String roomID, ArrayList<ZegoRoomExtraInfo> roomExtraInfoList) {
 
             }
         });
@@ -162,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
         return AppCenter.appID != 0L && !TextUtils.isEmpty(AppCenter.serverSecret);
     }
 
-    private void joinRoom(Callback callback) {
+    private void joinRoom(IZegoRoomLoginCallback callback) {
         String username = binding.username.getText().toString();
         String roomid = binding.roomid.getText().toString();
         String userID = System.currentTimeMillis() + "";
