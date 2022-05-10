@@ -7,6 +7,7 @@ import android.view.TextureView;
 import im.zego.zegoexpress.ZegoExpressEngine;
 import im.zego.zegoexpress.callback.IZegoEventHandler;
 import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
+import im.zego.zegoexpress.callback.IZegoRoomSetRoomExtraInfoCallback;
 import im.zego.zegoexpress.constants.ZegoPlayerState;
 import im.zego.zegoexpress.constants.ZegoPublisherState;
 import im.zego.zegoexpress.constants.ZegoRemoteDeviceState;
@@ -181,6 +182,9 @@ public class ExpressManager {
                 super.onRoomStateChanged(roomID, reason, errorCode, extendedData);
                 Log.d(TAG, "onRoomStateChanged() called with: roomID = [" + roomID + "], reason = [" + reason
                     + "], errorCode = [" + errorCode + "], extendedData = [" + extendedData + "]");
+                if (handler != null) {
+                    handler.onRoomStateChanged(roomID, reason, errorCode, extendedData);
+                }
             }
 
             @Override
@@ -233,7 +237,7 @@ public class ExpressManager {
         boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
         boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
         if (publishLocalAudio || publishLocalVideo) {
-            ZegoExpressEngine.getEngine().startPublishingStream(participant.streamID);
+            startPublishStream(participant.streamID);
             ZegoExpressEngine.getEngine().enableCamera(publishLocalVideo);
             ZegoExpressEngine.getEngine().muteMicrophone(!publishLocalAudio);
             participant.mic = publishLocalAudio;
@@ -294,11 +298,31 @@ public class ExpressManager {
         Log.d(TAG, "enableCamera() called with: enable = [" + enable + "]");
         ZegoExpressEngine.getEngine().enableCamera(enable);
         localParticipant.camera = enable;
+        if (enable) {
+            startPublishStream(localParticipant.streamID);
+        } else {
+            boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
+            boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
+            if (!localParticipant.mic && !publishLocalAudio && !publishLocalVideo) {
+                stopPublishStream(localParticipant.streamID);
+                ZegoExpressEngine.getEngine().stopPreview();
+            }
+        }
     }
 
     public void enableMic(boolean enable) {
         ZegoExpressEngine.getEngine().muteMicrophone(!enable);
         localParticipant.mic = !enable;
+        if (enable) {
+            startPublishStream(localParticipant.streamID);
+        } else {
+            boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
+            boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
+            if (!localParticipant.camera && !publishLocalAudio && !publishLocalVideo) {
+                stopPublishStream(localParticipant.streamID);
+                ZegoExpressEngine.getEngine().stopPreview();
+            }
+        }
     }
 
     public void switchFrontCamera(boolean front) {
@@ -318,8 +342,7 @@ public class ExpressManager {
         boolean autoPlayAudio = ZegoMediaOptions.autoPlayAudio(mediaOptions);
         if (autoPlayAudio || autoPlayVideo) {
             ZegoParticipant participant = streamUserMap.get(streamID);
-            ZegoCanvas canvas = generateCanvas(textureView);
-            ZegoExpressEngine.getEngine().startPlayingStream(streamID, canvas);
+            startPlayStream(streamID, generateCanvas(textureView));
             if (!autoPlayVideo) {
                 ZegoExpressEngine.getEngine().mutePlayStreamVideo(streamID, true);
             }
@@ -329,7 +352,23 @@ public class ExpressManager {
         }
     }
 
+    private void startPublishStream(String streamID) {
+        Log.d(TAG, "startPublishStream() called with: streamID = [" + streamID + "]");
+        ZegoExpressEngine.getEngine().startPublishingStream(streamID);
+    }
+
+    private void stopPublishStream(String streamID) {
+        Log.d(TAG, "stopPublishStream() called with: streamID = [" + streamID + "]");
+        ZegoExpressEngine.getEngine().stopPublishingStream();
+    }
+
+    private void startPlayStream(String streamID, ZegoCanvas canvas) {
+        Log.d(TAG, "startPlayStream() called with: streamID = [" + streamID + "], canvas = [" + canvas + "]");
+        ZegoExpressEngine.getEngine().startPlayingStream(streamID, canvas);
+    }
+
     public void stopPlayStream(String streamID) {
+        Log.d(TAG, "stopPlayStream() called with: streamID = [" + streamID + "]");
         ZegoExpressEngine.getEngine().stopPlayingStream(streamID);
     }
 
@@ -369,6 +408,15 @@ public class ExpressManager {
         }
     }
 
+    public void setRoomExtraInfo(String key, String value) {
+        ZegoExpressEngine.getEngine().setRoomExtraInfo(roomID, key, value, new IZegoRoomSetRoomExtraInfoCallback() {
+            @Override
+            public void onRoomSetRoomExtraInfoResult(int errorCode) {
+
+            }
+        });
+    }
+
     public interface ExpressManagerHandler {
 
         void onRoomUserUpdate(String roomID, ZegoUpdateType updateType, ArrayList<ZegoUser> userList);
@@ -378,5 +426,8 @@ public class ExpressManager {
         void onRoomTokenWillExpire(String roomID, int remainTimeInSecond);
 
         void onRoomExtraInfoUpdate(String roomID, ArrayList<ZegoRoomExtraInfo> roomExtraInfoList);
+
+        void onRoomStateChanged(String roomID, ZegoRoomStateChangedReason reason, int errorCode,
+            JSONObject extendedData);
     }
 }

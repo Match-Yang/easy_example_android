@@ -18,6 +18,7 @@ import im.zego.expresssample.express.ExpressManager.ExpressManagerHandler;
 import im.zego.expresssample.express.ZegoDeviceUpdateType;
 import im.zego.expresssample.express.ZegoMediaOptions;
 import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
+import im.zego.zegoexpress.constants.ZegoRoomStateChangedReason;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
 import im.zego.zegoexpress.entity.ZegoRoomExtraInfo;
 import im.zego.zegoexpress.entity.ZegoUser;
@@ -115,6 +116,12 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onRoomExtraInfoUpdate(String roomID, ArrayList<ZegoRoomExtraInfo> roomExtraInfoList) {
+
+            }
+
+            @Override
+            public void onRoomStateChanged(String roomID, ZegoRoomStateChangedReason reason, int errorCode,
+                JSONObject extendedData) {
 
             }
         });
