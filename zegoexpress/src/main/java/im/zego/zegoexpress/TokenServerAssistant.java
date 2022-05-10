@@ -1,4 +1,4 @@
-package im.zego.expresssample.express;
+package im.zego.zegoexpress;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -9,4 +9,8 @@
   <string name="invalid_username">Not a valid username</string>
   <string name="invalid_password">Password must be >5 characters</string>
   <string name="login_failed">"Login failed"</string>
+  <string name="zegocloud">ZEGOCLOUD</string>
+  <string name="room_id">Room ID</string>
+  <string name="join_live_as_host">Join Live as Host</string>
+  <string name="join_live_as_audience">Join Live as Audience</string>
 </resources>

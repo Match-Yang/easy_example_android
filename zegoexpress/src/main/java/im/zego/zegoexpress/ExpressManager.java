@@ -1,10 +1,9 @@
-package im.zego.expresssample.express;
+package im.zego.zegoexpress;
 
 import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.TextureView;
-import im.zego.zegoexpress.ZegoExpressEngine;
 import im.zego.zegoexpress.callback.IZegoEventHandler;
 import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
 import im.zego.zegoexpress.callback.IZegoRoomSetRoomExtraInfoCallback;
@@ -82,6 +81,10 @@ public class ExpressManager {
                         if (participant != null) {
                             participantMap.remove(participant.userID);
                             streamUserMap.remove(participant.streamID);
+                            WeakReference<TextureView> weakReference = streamViewMap.remove(participant.streamID);
+                            if (weakReference != null) {
+                                weakReference.clear();
+                            }
                         }
                     }
                 }
@@ -94,6 +97,8 @@ public class ExpressManager {
             public void onRoomStreamUpdate(String roomID, ZegoUpdateType updateType, ArrayList<ZegoStream> streamList,
                 JSONObject extendedData) {
                 super.onRoomStreamUpdate(roomID, updateType, streamList, extendedData);
+                Log.d(TAG, "onRoomStreamUpdate() called with: roomID = [" + roomID + "], updateType = [" + updateType
+                    + "], streamList = [" + streamList + "], extendedData = [" + extendedData + "]");
                 for (ZegoStream zegoStream : streamList) {
                     if (updateType == ZegoUpdateType.ADD) {
                         WeakReference<TextureView> weakReference = streamViewMap.get(zegoStream.streamID);
@@ -102,10 +107,6 @@ public class ExpressManager {
                         }
                     } else {
                         stopPlayStream(zegoStream.streamID);
-                        WeakReference<TextureView> weakReference = streamViewMap.remove(zegoStream.streamID);
-                        if (streamViewMap != null) {
-                            weakReference.clear();
-                        }
                     }
                 }
             }
@@ -236,6 +237,9 @@ public class ExpressManager {
 
         boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
         boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
+        Log.d(TAG, "joinRoom() called with: publishLocalAudio = [" + publishLocalAudio + "], publishLocalVideo = ["
+            + publishLocalVideo + "], token = [" + token
+            + "], mediaOptions = [" + mediaOptions + "], callback = [" + callback + "]");
         if (publishLocalAudio || publishLocalVideo) {
             startPublishStream(participant.streamID);
             ZegoExpressEngine.getEngine().enableCamera(publishLocalVideo);
@@ -291,6 +295,11 @@ public class ExpressManager {
         participantMap.put(participant.userID, participant);
         streamUserMap.put(participant.streamID, participant);
         playStream(participant.streamID, textureView);
+
+        WeakReference<TextureView> weakReference = streamViewMap.remove(participant.streamID);
+        if (weakReference != null) {
+            weakReference.clear();
+        }
         streamViewMap.put(participant.streamID, new WeakReference<>(textureView));
     }
 
@@ -305,12 +314,12 @@ public class ExpressManager {
             boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
             if (!localParticipant.mic && !publishLocalAudio && !publishLocalVideo) {
                 stopPublishStream(localParticipant.streamID);
-                ZegoExpressEngine.getEngine().stopPreview();
             }
         }
     }
 
     public void enableMic(boolean enable) {
+        Log.d(TAG, "enableMic() called with: enable = [" + enable + "]");
         ZegoExpressEngine.getEngine().muteMicrophone(!enable);
         localParticipant.mic = !enable;
         if (enable) {
@@ -320,7 +329,6 @@ public class ExpressManager {
             boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
             if (!localParticipant.camera && !publishLocalAudio && !publishLocalVideo) {
                 stopPublishStream(localParticipant.streamID);
-                ZegoExpressEngine.getEngine().stopPreview();
             }
         }
     }
@@ -340,6 +348,9 @@ public class ExpressManager {
     public void playStream(String streamID, TextureView textureView) {
         boolean autoPlayVideo = ZegoMediaOptions.autoPlayVideo(mediaOptions);
         boolean autoPlayAudio = ZegoMediaOptions.autoPlayAudio(mediaOptions);
+        Log.d(TAG,
+            "playStream() called with: autoPlayVideo = [" + autoPlayVideo + "], autoPlayAudio = [" + autoPlayAudio
+                + "]");
         if (autoPlayAudio || autoPlayVideo) {
             ZegoParticipant participant = streamUserMap.get(streamID);
             startPlayStream(streamID, generateCanvas(textureView));
@@ -395,6 +406,10 @@ public class ExpressManager {
         return localParticipant;
     }
 
+    public ZegoParticipant getParticipant(String userID) {
+        return participantMap.get(userID);
+    }
+
     public void setExpressHandler(ExpressManagerHandler handler) {
         this.handler = handler;
     }
@@ -408,13 +423,21 @@ public class ExpressManager {
         }
     }
 
-    public void setRoomExtraInfo(String key, String value) {
+    public void setRoomExtraInfo(String key, String value, IZegoRoomSetRoomExtraInfoCallback callback) {
+        Log.d(TAG, "setRoomExtraInfo() called with: key = [" + key + "], value = [" + value + "]");
         ZegoExpressEngine.getEngine().setRoomExtraInfo(roomID, key, value, new IZegoRoomSetRoomExtraInfoCallback() {
             @Override
             public void onRoomSetRoomExtraInfoResult(int errorCode) {
-
+                Log.d(TAG, "onRoomSetRoomExtraInfoResult() called with: errorCode = [" + errorCode + "]");
+                if (callback != null) {
+                    callback.onRoomSetRoomExtraInfoResult(errorCode);
+                }
             }
         });
+    }
+
+    public void setRoomExtraInfo(String key, String value) {
+        setRoomExtraInfo(key, value, null);
     }
 
     public interface ExpressManagerHandler {
