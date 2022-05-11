@@ -14,13 +14,14 @@ import com.permissionx.guolindev.PermissionX;
 import im.zego.expresssample.express.AppCenter;
 import im.zego.expresssample.databinding.ActivityLoginBinding;
 import im.zego.expresssample.express.ExpressManager;
-import im.zego.expresssample.express.ExpressManager.Callback;
 import im.zego.expresssample.express.ExpressManager.ExpressManagerHandler;
 import im.zego.expresssample.express.ZegoDeviceUpdateType;
 import im.zego.expresssample.express.ZegoMediaOptions;
+import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.util.ArrayList;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -44,35 +45,20 @@ public class LoginActivity extends AppCompatActivity {
                         "please set your appID to AppCenter.java", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                boolean validate = validateInput();
-                if (validate) {
-                    PermissionX.init(LoginActivity.this)
-                        .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-                        .request((allGranted, grantedList, deniedList) -> {
-                            if (allGranted) {
-                                binding.loading.setVisibility(View.VISIBLE);
-                                joinRoom(new Callback() {
-                                    @Override
-                                    public void onResult(int errorCode) {
-                                        Log.d(TAG, "onResult() called with: errorCode = [" + errorCode + "]");
-                                        binding.loading.setVisibility(View.GONE);
-                                        if (errorCode == 0) {
-                                            binding.layoutLogin.setVisibility(View.GONE);
-                                            binding.layoutRoom.setVisibility(View.VISIBLE);
-                                            ExpressManager.getInstance().setLocalVideoView(binding.localTexture);
-                                            binding.localName.setText(binding.username.getText().toString());
-                                        } else {
-                                            Toast.makeText(getApplication(), "join room failed,errorCode :" + errorCode,
-                                                Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                } else {
+                if (! validateInput()) {
                     Toast.makeText(getApplication(),
                         "input cannot be null", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                PermissionX.init(LoginActivity.this)
+                    .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                    .request((allGranted, grantedList, deniedList) -> {
+                        if (allGranted) {
+                            String username = binding.username.getText().toString();
+                            String roomID = binding.roomid.getText().toString();
+                            joinRoom(roomID, username);
+                        }
+                    });
             }
         });
 
@@ -154,23 +140,36 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void joinRoom(String roomID ,String username) {
+        binding.loading.setVisibility(View.VISIBLE);
+        String userID = System.currentTimeMillis() + "";
+        ZegoUser user = new ZegoUser(userID, username);
+        String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
+        int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
+            ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
+        ExpressManager.getInstance().joinRoom(roomID, user, token, mediaOptions, new IZegoRoomLoginCallback() {
+            @Override
+            public void onRoomLoginResult(int errorCode, JSONObject jsonObject) {
+                binding.loading.setVisibility(View.GONE);
+                if (errorCode == 0) {
+                    binding.layoutLogin.setVisibility(View.GONE);
+                    binding.layoutRoom.setVisibility(View.VISIBLE);
+                    ExpressManager.getInstance().setLocalVideoView(binding.localTexture);
+                    binding.localName.setText(binding.username.getText().toString());
+                } else {
+                    Toast.makeText(getApplication(), "join room failed,errorCode :" + errorCode,
+                        Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
     private boolean validateInput() {
         return binding.username.getText().length() > 0 && binding.roomid.getText().length() > 0;
     }
 
     private boolean checkAppID() {
         return AppCenter.appID != 0L && !TextUtils.isEmpty(AppCenter.serverSecret);
-    }
-
-    private void joinRoom(Callback callback) {
-        String username = binding.username.getText().toString();
-        String roomid = binding.roomid.getText().toString();
-        String userID = System.currentTimeMillis() + "";
-        ZegoUser user = new ZegoUser(userID, username);
-        String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
-        int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
-            ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
-        ExpressManager.getInstance().joinRoom(roomid, user, token, mediaOptions, callback);
     }
 
     private void setRemoteViewVisible(boolean visible) {
