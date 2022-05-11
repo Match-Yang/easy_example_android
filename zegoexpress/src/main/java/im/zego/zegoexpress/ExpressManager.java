@@ -414,6 +414,15 @@ public class ExpressManager {
         this.handler = handler;
     }
 
+    /**
+     * for security,token should be generated in server side,
+     * this method is only used for demo test,and may be deprecated in future update.
+     * https://docs.zegocloud.com/article/11649
+     * @param userID
+     * @param appID
+     * @param serverSecret
+     * @return
+     */
     public static String generateToken(String userID, long appID, String serverSecret) {
         try {
             return TokenServerAssistant.generateToken(appID, userID, serverSecret, 60 * 60 * 24).data;

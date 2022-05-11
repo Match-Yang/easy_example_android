@@ -47,7 +47,65 @@ public class MainActivity extends AppCompatActivity {
             // if join as host,preview host's video view in fullview
             setRenderToView(hostID, true, true);
             binding.cohostBtn.setVisibility(View.GONE);
+        } else {
+            binding.cameraBtn.setVisibility(View.GONE);
+            binding.micBtn.setVisibility(View.GONE);
+            binding.switchBtn.setVisibility(View.GONE);
         }
+
+        binding.logoutRoom.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ExpressManager.getInstance().leaveRoom();
+                finish();
+            }
+        });
+
+        binding.switchBtn.setSelected(joinAsHost);
+        binding.switchBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean selected = v.isSelected();
+                v.setSelected(!selected);
+                ExpressManager.getInstance().switchFrontCamera(!selected);
+            }
+        });
+
+        binding.cameraBtn.setSelected(joinAsHost);
+        binding.cameraBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean selected = v.isSelected();
+                v.setSelected(!selected);
+                ExpressManager.getInstance().enableCamera(!selected);
+            }
+        });
+        binding.micBtn.setSelected(joinAsHost);
+        binding.micBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean selected = v.isSelected();
+                v.setSelected(!selected);
+                ExpressManager.getInstance().enableMic(!selected);
+            }
+        });
+
+        binding.cohostBtn.setSelected(false);
+        binding.cohostBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean selected = v.isSelected();
+                if (selected) {
+                    if (localParticipant.userID.equals(coHostID)) {
+                        leaveCoHostLive();
+                    }
+                } else {
+                    if (TextUtils.isEmpty(coHostID)) {
+                        joinLiveAsCoHost(localParticipant.userID);
+                    }
+                }
+            }
+        });
 
         ExpressManager.getInstance().setExpressHandler(new ExpressManagerHandler() {
             @Override
@@ -56,10 +114,10 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < userList.size(); i++) {
                         ZegoUser user = userList.get(i);
                         if (user.userID.equals(hostID)) {
-//                            if (!joinAsHost) {
-//                                // if join as audience,play host's video view in fullview
-//                                setRenderToView(hostID, true, false);
-//                            }
+                            if (!joinAsHost) {
+                                // if join as audience,play host's video view in fullview
+                                setRenderToView(hostID, true, false);
+                            }
                         }
                     }
                 } else {
@@ -116,90 +174,74 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject extendedData) {
             }
         });
-
-        binding.logoutRoom.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ExpressManager.getInstance().leaveRoom();
-                finish();
-            }
-        });
-
-        binding.switchBtn.setSelected(joinAsHost);
-        binding.switchBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean selected = v.isSelected();
-                v.setSelected(!selected);
-                ExpressManager.getInstance().switchFrontCamera(!selected);
-            }
-        });
-
-        binding.cameraBtn.setSelected(joinAsHost);
-        binding.cameraBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean selected = v.isSelected();
-                v.setSelected(!selected);
-                ExpressManager.getInstance().enableCamera(!selected);
-            }
-        });
-        binding.micBtn.setSelected(joinAsHost);
-        binding.micBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean selected = v.isSelected();
-                v.setSelected(!selected);
-                ExpressManager.getInstance().enableMic(!selected);
-            }
-        });
-
-        binding.cohostBtn.setSelected(false);
-        binding.cohostBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean selected = v.isSelected();
-                v.setSelected(!selected);
-                if (selected) {
-                    ExpressManager.getInstance().setRoomExtraInfo(CO_HOST_ID, "");
-                    coHostID = "";
-                    binding.cameraBtn.setSelected(false);
-                    ExpressManager.getInstance().enableCamera(false);
-                    binding.micBtn.setSelected(false);
-                    ExpressManager.getInstance().enableMic(false);
-                    setRenderToView(coHostID, false, true);
-                } else {
-                    ExpressManager.getInstance().setRoomExtraInfo(CO_HOST_ID, localParticipant.userID,
-                        new IZegoRoomSetRoomExtraInfoCallback() {
-                            @Override
-                            public void onRoomSetRoomExtraInfoResult(int errorCode) {
-                                if (errorCode == 0) {
-                                    coHostID = localParticipant.userID;
-                                    binding.cameraBtn.setSelected(true);
-                                    ExpressManager.getInstance().enableCamera(true);
-                                    binding.micBtn.setSelected(true);
-                                    ExpressManager.getInstance().enableMic(true);
-                                    setRenderToView(coHostID, false, true);
-                                }
-                            }
-                        });
-                }
-            }
-        });
     }
 
+    private void leaveCoHostLive() {
+        ExpressManager.getInstance().setRoomExtraInfo(CO_HOST_ID, "", new IZegoRoomSetRoomExtraInfoCallback() {
+            @Override
+            public void onRoomSetRoomExtraInfoResult(int i) {
+                coHostID = "";
+                setRenderToView(coHostID, false, true);
+
+                ExpressManager.getInstance().enableCamera(false);
+                ExpressManager.getInstance().enableMic(false);
+                binding.cameraBtn.setSelected(false);
+                binding.micBtn.setSelected(false);
+                binding.cameraBtn.setVisibility(View.GONE);
+                binding.micBtn.setVisibility(View.GONE);
+                binding.switchBtn.setVisibility(View.GONE);
+
+                binding.cohostBtn.setSelected(false);
+            }
+        });
+
+    }
+
+    private void joinLiveAsCoHost(String userID) {
+        ExpressManager.getInstance().setRoomExtraInfo(CO_HOST_ID, userID,
+            new IZegoRoomSetRoomExtraInfoCallback() {
+                @Override
+                public void onRoomSetRoomExtraInfoResult(int errorCode) {
+                    if (errorCode == 0) {
+                        coHostID = userID;
+                        setRenderToView(coHostID, false, true);
+
+                        ExpressManager.getInstance().enableCamera(true);
+                        ExpressManager.getInstance().enableMic(true);
+                        binding.cameraBtn.setSelected(true);
+                        binding.micBtn.setSelected(true);
+                        binding.cameraBtn.setVisibility(View.VISIBLE);
+                        binding.micBtn.setVisibility(View.VISIBLE);
+                        binding.switchBtn.setVisibility(View.VISIBLE);
+
+                        binding.cohostBtn.setSelected(true);
+                    }
+                }
+            });
+    }
+
+    /**
+     *
+     * @param userID if userID is empty,no render
+     * @param toFullView
+     * @param isLocalVideo
+     */
     public void setRenderToView(String userID, boolean toFullView, boolean isLocalVideo) {
         Log.d(TAG, "setRenderToView() called with: userID = [" + userID + "], toFullView = [" + toFullView
             + "], isLocalVideo = [" + isLocalVideo + "]");
         ZegoParticipant participant = ExpressManager.getInstance().getParticipant(userID);
         if (toFullView) {
-            if (isLocalVideo) {
-                ExpressManager.getInstance().setLocalVideoView(binding.fullViewTexture);
+            if (TextUtils.isEmpty(userID)) {
+
             } else {
-                ExpressManager.getInstance().setRemoteVideoView(userID, binding.fullViewTexture);
-            }
-            if (participant != null) {
-                binding.fullViewName.setText(participant.name);
+                if (isLocalVideo) {
+                    ExpressManager.getInstance().setLocalVideoView(binding.fullViewTexture);
+                } else {
+                    ExpressManager.getInstance().setRemoteVideoView(userID, binding.fullViewTexture);
+                }
+                if (participant != null) {
+                    binding.fullViewName.setText(participant.name);
+                }
             }
         } else {
             if (TextUtils.isEmpty(userID)) {
