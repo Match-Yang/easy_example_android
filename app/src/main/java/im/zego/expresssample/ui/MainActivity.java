@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import im.zego.expresssample.databinding.ActivityMainBinding;
 import im.zego.zegoexpress.ExpressManager;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ExpressManager.getInstance().leaveRoom();
+                leaveCoHostLive();
                 finish();
             }
         });
@@ -98,10 +100,14 @@ public class MainActivity extends AppCompatActivity {
                 if (selected) {
                     if (localParticipant.userID.equals(coHostID)) {
                         leaveCoHostLive();
+                    }else {
+                        Toast.makeText(MainActivity.this,"your are not cohost now",Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     if (TextUtils.isEmpty(coHostID)) {
                         joinLiveAsCoHost(localParticipant.userID);
+                    }else {
+                        Toast.makeText(MainActivity.this,"someone is cohost now",Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -264,5 +270,6 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         ExpressManager.getInstance().leaveRoom();
+        leaveCoHostLive();
     }
 }
