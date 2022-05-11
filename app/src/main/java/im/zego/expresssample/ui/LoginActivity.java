@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             });
     }
 
-    private void joinRoom(String roomID, boolean asHost, IZegoRoomLoginCallback callback) {
+    private void joinRoom(String roomID, boolean joinAsHost, IZegoRoomLoginCallback callback) {
         binding.loginLoading.setVisibility(View.VISIBLE);
         Random random = new Random(System.currentTimeMillis());
         String userID = System.currentTimeMillis() + "";
@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         ZegoUser user = new ZegoUser(userID, username);
         String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
         int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo;
-        if (asHost) {
+        if (joinAsHost) {
             mediaOptions = mediaOptions |
                 ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
         }
