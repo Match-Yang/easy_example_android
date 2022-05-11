@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.TextureView;
 import im.zego.zegoexpress.ZegoExpressEngine;
 import im.zego.zegoexpress.callback.IZegoEventHandler;
+import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
 import im.zego.zegoexpress.constants.ZegoPlayerState;
 import im.zego.zegoexpress.constants.ZegoPublisherState;
 import im.zego.zegoexpress.constants.ZegoRemoteDeviceState;
@@ -52,7 +53,6 @@ public class ExpressManager {
     private int mediaOptions;
     private String roomID;
     private ExpressManagerHandler handler;
-    private Callback joinRoomCallback;
 
     public void createEngine(Application application, long appID) {
         ZegoEngineProfile profile = new ZegoEngineProfile();
@@ -80,6 +80,10 @@ public class ExpressManager {
                         if (participant != null) {
                             participantMap.remove(participant.userID);
                             streamUserMap.remove(participant.streamID);
+                            WeakReference<TextureView> weakReference = streamViewMap.remove(participant.streamID);
+                            if (weakReference != null) {
+                                weakReference.clear();
+                            }
                         }
                     }
                 }
@@ -100,10 +104,6 @@ public class ExpressManager {
                         }
                     } else {
                         stopPlayStream(zegoStream.streamID);
-                        WeakReference<TextureView> weakReference = streamViewMap.remove(zegoStream.streamID);
-                        if (streamViewMap != null) {
-                            weakReference.clear();
-                        }
                     }
                 }
             }
@@ -172,12 +172,6 @@ public class ExpressManager {
                 Log.d(TAG,
                     "onRoomStateUpdate() called with: roomID = [" + roomID + "], state = [" + state + "], errorCode = ["
                         + errorCode + "], extendedData = [" + extendedData + "]");
-                if (state == ZegoRoomState.CONNECTED) {
-                    if (joinRoomCallback != null) {
-                        joinRoomCallback.onResult(errorCode);
-                        joinRoomCallback = null;
-                    }
-                }
             }
 
             @Override
@@ -198,7 +192,7 @@ public class ExpressManager {
         });
     }
 
-    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions, Callback callback) {
+    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions, IZegoRoomLoginCallback callback) {
         participantMap.clear();
         streamUserMap.clear();
         if (TextUtils.isEmpty(token)) {
@@ -217,7 +211,7 @@ public class ExpressManager {
         // if you need limit participant count, you can change the max member count
         config.maxMemberCount = 0;
         config.isUserStatusNotify = true;
-        ZegoExpressEngine.getEngine().loginRoom(roomID, zegoUser, config);
+        ZegoExpressEngine.getEngine().loginRoom(roomID, zegoUser, config, callback);
 
         boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
         boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
@@ -228,7 +222,6 @@ public class ExpressManager {
             participant.mic = publishLocalAudio;
             participant.camera = publishLocalVideo;
         }
-        this.joinRoomCallback = callback;
     }
 
     public void setLocalVideoView(TextureView textureView) {
@@ -350,6 +343,15 @@ public class ExpressManager {
         this.handler = handler;
     }
 
+    /**
+     * for security,token should be generated in server side,
+     * this method is only used for demo test,and may be deprecated in future update.
+     * https://docs.zegocloud.com/article/11649
+     * @param userID
+     * @param appID
+     * @param serverSecret
+     * @return
+     */
     public static String generateToken(String userID, long appID, String serverSecret) {
         try {
             return TokenServerAssistant.generateToken(appID, userID, serverSecret, 60 * 60 * 24).data;
@@ -366,10 +368,5 @@ public class ExpressManager {
         void onRoomUserDeviceUpdate(ZegoDeviceUpdateType updateType, String userID, String roomID);
 
         void onRoomTokenWillExpire(String roomID, int remainTimeInSecond);
-    }
-
-    public interface Callback {
-
-        void onResult(int errorCode);
     }
 }
