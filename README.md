@@ -61,7 +61,7 @@ Before using the SDK function, you need to create the SDK first. We recommend cr
 ```java
  ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID);
 ```
-### Request camera and audio Permission
+#### Request camera and audio Permission
 ```java
  PermissionX.init(this)
     .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
