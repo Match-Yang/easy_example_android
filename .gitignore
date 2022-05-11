@@ -40,3 +40,5 @@ proguard/
 # Others
 .idea/
 *.iml
+
+app/src/main/java/im/zego/expresssample/express/AppCenter.java

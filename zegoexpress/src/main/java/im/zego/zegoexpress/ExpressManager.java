@@ -1,15 +1,16 @@
-package im.zego.expresssample.express;
+package im.zego.zegoexpress;
 
 import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.TextureView;
-import im.zego.zegoexpress.ZegoExpressEngine;
 import im.zego.zegoexpress.callback.IZegoEventHandler;
+import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
+import im.zego.zegoexpress.callback.IZegoRoomSetRoomExtraInfoCallback;
 import im.zego.zegoexpress.constants.ZegoPlayerState;
 import im.zego.zegoexpress.constants.ZegoPublisherState;
 import im.zego.zegoexpress.constants.ZegoRemoteDeviceState;
-import im.zego.zegoexpress.constants.ZegoRoomState;
+import im.zego.zegoexpress.constants.ZegoRoomStateChangedReason;
 import im.zego.zegoexpress.constants.ZegoScenario;
 import im.zego.zegoexpress.constants.ZegoStreamQualityLevel;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
@@ -18,6 +19,7 @@ import im.zego.zegoexpress.entity.ZegoCanvas;
 import im.zego.zegoexpress.entity.ZegoEngineConfig;
 import im.zego.zegoexpress.entity.ZegoEngineProfile;
 import im.zego.zegoexpress.entity.ZegoRoomConfig;
+import im.zego.zegoexpress.entity.ZegoRoomExtraInfo;
 import im.zego.zegoexpress.entity.ZegoStream;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.lang.ref.WeakReference;
@@ -52,7 +54,6 @@ public class ExpressManager {
     private int mediaOptions;
     private String roomID;
     private ExpressManagerHandler handler;
-    private Callback joinRoomCallback;
 
     public void createEngine(Application application, long appID) {
         ZegoEngineProfile profile = new ZegoEngineProfile();
@@ -80,6 +81,10 @@ public class ExpressManager {
                         if (participant != null) {
                             participantMap.remove(participant.userID);
                             streamUserMap.remove(participant.streamID);
+                            WeakReference<TextureView> weakReference = streamViewMap.remove(participant.streamID);
+                            if (weakReference != null) {
+                                weakReference.clear();
+                            }
                         }
                     }
                 }
@@ -92,6 +97,8 @@ public class ExpressManager {
             public void onRoomStreamUpdate(String roomID, ZegoUpdateType updateType, ArrayList<ZegoStream> streamList,
                 JSONObject extendedData) {
                 super.onRoomStreamUpdate(roomID, updateType, streamList, extendedData);
+                Log.d(TAG, "onRoomStreamUpdate() called with: roomID = [" + roomID + "], updateType = [" + updateType
+                    + "], streamList = [" + streamList + "], extendedData = [" + extendedData + "]");
                 for (ZegoStream zegoStream : streamList) {
                     if (updateType == ZegoUpdateType.ADD) {
                         WeakReference<TextureView> weakReference = streamViewMap.get(zegoStream.streamID);
@@ -100,10 +107,6 @@ public class ExpressManager {
                         }
                     } else {
                         stopPlayStream(zegoStream.streamID);
-                        WeakReference<TextureView> weakReference = streamViewMap.remove(zegoStream.streamID);
-                        if (streamViewMap != null) {
-                            weakReference.clear();
-                        }
                     }
                 }
             }
@@ -167,16 +170,21 @@ public class ExpressManager {
             }
 
             @Override
-            public void onRoomStateUpdate(String roomID, ZegoRoomState state, int errorCode, JSONObject extendedData) {
-                super.onRoomStateUpdate(roomID, state, errorCode, extendedData);
-                Log.d(TAG,
-                    "onRoomStateUpdate() called with: roomID = [" + roomID + "], state = [" + state + "], errorCode = ["
-                        + errorCode + "], extendedData = [" + extendedData + "]");
-                if (state == ZegoRoomState.CONNECTED) {
-                    if (joinRoomCallback != null) {
-                        joinRoomCallback.onResult(errorCode);
-                        joinRoomCallback = null;
-                    }
+            public void onRoomExtraInfoUpdate(String roomID, ArrayList<ZegoRoomExtraInfo> roomExtraInfoList) {
+                super.onRoomExtraInfoUpdate(roomID, roomExtraInfoList);
+                if (handler != null) {
+                    handler.onRoomExtraInfoUpdate(roomID, roomExtraInfoList);
+                }
+            }
+
+            @Override
+            public void onRoomStateChanged(String roomID, ZegoRoomStateChangedReason reason, int errorCode,
+                JSONObject extendedData) {
+                super.onRoomStateChanged(roomID, reason, errorCode, extendedData);
+                Log.d(TAG, "onRoomStateChanged() called with: roomID = [" + roomID + "], reason = [" + reason
+                    + "], errorCode = [" + errorCode + "], extendedData = [" + extendedData + "]");
+                if (handler != null) {
+                    handler.onRoomStateChanged(roomID, reason, errorCode, extendedData);
                 }
             }
 
@@ -198,7 +206,8 @@ public class ExpressManager {
         });
     }
 
-    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions, Callback callback) {
+    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions,
+        IZegoRoomLoginCallback callback) {
         participantMap.clear();
         streamUserMap.clear();
         if (TextUtils.isEmpty(token)) {
@@ -217,18 +226,27 @@ public class ExpressManager {
         // if you need limit participant count, you can change the max member count
         config.maxMemberCount = 0;
         config.isUserStatusNotify = true;
-        ZegoExpressEngine.getEngine().loginRoom(roomID, zegoUser, config);
+        ZegoExpressEngine.getEngine().loginRoom(roomID, zegoUser, config, new IZegoRoomLoginCallback() {
+            @Override
+            public void onRoomLoginResult(int errorCode, JSONObject extendedData) {
+                if (callback != null) {
+                    callback.onRoomLoginResult(errorCode, extendedData);
+                }
+            }
+        });
 
         boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
         boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
+        Log.d(TAG, "joinRoom() called with: publishLocalAudio = [" + publishLocalAudio + "], publishLocalVideo = ["
+            + publishLocalVideo + "], token = [" + token
+            + "], mediaOptions = [" + mediaOptions + "], callback = [" + callback + "]");
         if (publishLocalAudio || publishLocalVideo) {
-            ZegoExpressEngine.getEngine().startPublishingStream(participant.streamID);
+            startPublishStream(participant.streamID);
             ZegoExpressEngine.getEngine().enableCamera(publishLocalVideo);
             ZegoExpressEngine.getEngine().muteMicrophone(!publishLocalAudio);
             participant.mic = publishLocalAudio;
             participant.camera = publishLocalVideo;
         }
-        this.joinRoomCallback = callback;
     }
 
     public void setLocalVideoView(TextureView textureView) {
@@ -277,6 +295,11 @@ public class ExpressManager {
         participantMap.put(participant.userID, participant);
         streamUserMap.put(participant.streamID, participant);
         playStream(participant.streamID, textureView);
+
+        WeakReference<TextureView> weakReference = streamViewMap.remove(participant.streamID);
+        if (weakReference != null) {
+            weakReference.clear();
+        }
         streamViewMap.put(participant.streamID, new WeakReference<>(textureView));
     }
 
@@ -284,11 +307,30 @@ public class ExpressManager {
         Log.d(TAG, "enableCamera() called with: enable = [" + enable + "]");
         ZegoExpressEngine.getEngine().enableCamera(enable);
         localParticipant.camera = enable;
+        if (enable) {
+            startPublishStream(localParticipant.streamID);
+        } else {
+            boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
+            boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
+            if (!localParticipant.mic && !publishLocalAudio && !publishLocalVideo) {
+                stopPublishStream(localParticipant.streamID);
+            }
+        }
     }
 
     public void enableMic(boolean enable) {
+        Log.d(TAG, "enableMic() called with: enable = [" + enable + "]");
         ZegoExpressEngine.getEngine().muteMicrophone(!enable);
         localParticipant.mic = !enable;
+        if (enable) {
+            startPublishStream(localParticipant.streamID);
+        } else {
+            boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
+            boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
+            if (!localParticipant.camera && !publishLocalAudio && !publishLocalVideo) {
+                stopPublishStream(localParticipant.streamID);
+            }
+        }
     }
 
     public void switchFrontCamera(boolean front) {
@@ -306,10 +348,12 @@ public class ExpressManager {
     public void playStream(String streamID, TextureView textureView) {
         boolean autoPlayVideo = ZegoMediaOptions.autoPlayVideo(mediaOptions);
         boolean autoPlayAudio = ZegoMediaOptions.autoPlayAudio(mediaOptions);
+        Log.d(TAG,
+            "playStream() called with: autoPlayVideo = [" + autoPlayVideo + "], autoPlayAudio = [" + autoPlayAudio
+                + "]");
         if (autoPlayAudio || autoPlayVideo) {
             ZegoParticipant participant = streamUserMap.get(streamID);
-            ZegoCanvas canvas = generateCanvas(textureView);
-            ZegoExpressEngine.getEngine().startPlayingStream(streamID, canvas);
+            startPlayStream(streamID, generateCanvas(textureView));
             if (!autoPlayVideo) {
                 ZegoExpressEngine.getEngine().mutePlayStreamVideo(streamID, true);
             }
@@ -319,7 +363,23 @@ public class ExpressManager {
         }
     }
 
+    private void startPublishStream(String streamID) {
+        Log.d(TAG, "startPublishStream() called with: streamID = [" + streamID + "]");
+        ZegoExpressEngine.getEngine().startPublishingStream(streamID);
+    }
+
+    private void stopPublishStream(String streamID) {
+        Log.d(TAG, "stopPublishStream() called with: streamID = [" + streamID + "]");
+        ZegoExpressEngine.getEngine().stopPublishingStream();
+    }
+
+    private void startPlayStream(String streamID, ZegoCanvas canvas) {
+        Log.d(TAG, "startPlayStream() called with: streamID = [" + streamID + "], canvas = [" + canvas + "]");
+        ZegoExpressEngine.getEngine().startPlayingStream(streamID, canvas);
+    }
+
     public void stopPlayStream(String streamID) {
+        Log.d(TAG, "stopPlayStream() called with: streamID = [" + streamID + "]");
         ZegoExpressEngine.getEngine().stopPlayingStream(streamID);
     }
 
@@ -346,10 +406,23 @@ public class ExpressManager {
         return localParticipant;
     }
 
+    public ZegoParticipant getParticipant(String userID) {
+        return participantMap.get(userID);
+    }
+
     public void setExpressHandler(ExpressManagerHandler handler) {
         this.handler = handler;
     }
 
+    /**
+     * for security,token should be generated in server side,
+     * this method is only used for demo test,and may be deprecated in future update.
+     * https://docs.zegocloud.com/article/11649
+     * @param userID
+     * @param appID
+     * @param serverSecret
+     * @return
+     */
     public static String generateToken(String userID, long appID, String serverSecret) {
         try {
             return TokenServerAssistant.generateToken(appID, userID, serverSecret, 60 * 60 * 24).data;
@@ -359,6 +432,23 @@ public class ExpressManager {
         }
     }
 
+    public void setRoomExtraInfo(String key, String value, IZegoRoomSetRoomExtraInfoCallback callback) {
+        Log.d(TAG, "setRoomExtraInfo() called with: key = [" + key + "], value = [" + value + "]");
+        ZegoExpressEngine.getEngine().setRoomExtraInfo(roomID, key, value, new IZegoRoomSetRoomExtraInfoCallback() {
+            @Override
+            public void onRoomSetRoomExtraInfoResult(int errorCode) {
+                Log.d(TAG, "onRoomSetRoomExtraInfoResult() called with: errorCode = [" + errorCode + "]");
+                if (callback != null) {
+                    callback.onRoomSetRoomExtraInfoResult(errorCode);
+                }
+            }
+        });
+    }
+
+    public void setRoomExtraInfo(String key, String value) {
+        setRoomExtraInfo(key, value, null);
+    }
+
     public interface ExpressManagerHandler {
 
         void onRoomUserUpdate(String roomID, ZegoUpdateType updateType, ArrayList<ZegoUser> userList);
@@ -366,10 +456,10 @@ public class ExpressManager {
         void onRoomUserDeviceUpdate(ZegoDeviceUpdateType updateType, String userID, String roomID);
 
         void onRoomTokenWillExpire(String roomID, int remainTimeInSecond);
-    }
 
-    public interface Callback {
+        void onRoomExtraInfoUpdate(String roomID, ArrayList<ZegoRoomExtraInfo> roomExtraInfoList);
 
-        void onResult(int errorCode);
+        void onRoomStateChanged(String roomID, ZegoRoomStateChangedReason reason, int errorCode,
+            JSONObject extendedData);
     }
 }
