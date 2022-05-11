@@ -5,6 +5,7 @@
   android:id="@+id/container"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:background="#dddddd"
   android:paddingLeft="@dimen/activity_horizontal_margin"
   android:paddingTop="@dimen/activity_vertical_margin"
   android:paddingRight="@dimen/activity_horizontal_margin"
@@ -26,92 +27,97 @@
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintVertical_bias="0.3" />
 
-    <FrameLayout
-      android:id="@+id/full_view_layout"
+  <FrameLayout
+    android:id="@+id/full_view_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextureView
+      android:id="@+id/full_view_texture"
       android:layout_width="match_parent"
-      android:layout_height="match_parent">
+      android:layout_height="match_parent" />
 
-      <TextureView
-        android:id="@+id/full_view_texture"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-      <TextView
-        android:id="@+id/full_view_name"
-        android:layout_width="wrap_content"
-        android:textColor="@color/white"
-        android:layout_height="wrap_content" />
-    </FrameLayout>
-
-    <FrameLayout
-      android:id="@+id/small_view_layout"
-      android:layout_width="180dp"
-      android:layout_height="240dp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent">
-
-      <TextureView
-        android:id="@+id/small_view_texture"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-      <TextView
-        android:id="@+id/small_view_name"
-        android:layout_width="wrap_content"
-        android:textColor="@color/white"
-        android:layout_height="wrap_content" />
-    </FrameLayout>
-
-    <Button
-      android:id="@+id/logout_room"
+    <TextView
+      android:id="@+id/full_view_name"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="logout room"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent" />
+      android:textColor="@color/white" />
+  </FrameLayout>
+
+  <FrameLayout
+    android:id="@+id/small_view_layout"
+    android:layout_width="180dp"
+    android:layout_height="240dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <TextureView
+      android:id="@+id/small_view_texture"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
+    <TextView
+      android:id="@+id/small_view_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textColor="@color/white" />
+  </FrameLayout>
+
+  <Button
+    android:id="@+id/logout_room"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="leave room"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:layout_constraintBottom_toTopOf="@id/logout_room">
 
-    <Button
+    <ImageView
       android:id="@+id/camera_btn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:src="@drawable/selector_camera_button"
       android:text="camera"
-      app:layout_constraintHorizontal_chainStyle="spread"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/mic_btn"
       app:layout_constraintHorizontal_bias="0.5"
+      app:layout_constraintHorizontal_chainStyle="spread"
       app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <ImageView
       android:id="@+id/mic_btn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="mic"
+      android:src="@drawable/selector_mic_button"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/switch_btn"
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toEndOf="@+id/camera_btn" />
 
-    <Button
+    <ImageView
       android:id="@+id/switch_btn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:src="@drawable/selector_switch_button"
       android:text="switch"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/cohost_btn"
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toEndOf="@+id/mic_btn" />
 
-    <Button
+    <ImageView
       android:id="@+id/cohost_btn"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_height="47dp"
+      android:layout_width="47dp"
+      android:src="@drawable/icon_cohost"
       android:text="cohost"
+      android:scaleType="center"
+      app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
