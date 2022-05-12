@@ -40,3 +40,6 @@ proguard/
 # Others
 .idea/
 *.iml
+
+app/your_app_key.jks
+app/google-services.json

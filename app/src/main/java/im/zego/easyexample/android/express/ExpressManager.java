@@ -1,4 +1,4 @@
-package im.zego.expresssample.express;
+package im.zego.easyexample.android.express;
 
 import android.app.Application;
 import android.text.TextUtils;

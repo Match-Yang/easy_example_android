@@ -1,4 +1,4 @@
-package im.zego.expresssample.express;
+package im.zego.easyexample.android.express;
 
 public class AppCenter {
 

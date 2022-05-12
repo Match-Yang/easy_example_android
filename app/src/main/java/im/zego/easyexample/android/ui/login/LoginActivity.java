@@ -1,4 +1,4 @@
-package im.zego.expresssample.ui.login;
+package im.zego.easyexample.android.ui.login;
 
 import android.Manifest;
 import android.os.Build;
@@ -11,12 +11,12 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.permissionx.guolindev.PermissionX;
-import im.zego.expresssample.express.AppCenter;
-import im.zego.expresssample.databinding.ActivityLoginBinding;
-import im.zego.expresssample.express.ExpressManager;
-import im.zego.expresssample.express.ExpressManager.ExpressManagerHandler;
-import im.zego.expresssample.express.ZegoDeviceUpdateType;
-import im.zego.expresssample.express.ZegoMediaOptions;
+import im.zego.easyexample.android.databinding.ActivityLoginBinding;
+import im.zego.easyexample.android.express.AppCenter;
+import im.zego.easyexample.android.express.ExpressManager;
+import im.zego.easyexample.android.express.ExpressManager.ExpressManagerHandler;
+import im.zego.easyexample.android.express.ZegoDeviceUpdateType;
+import im.zego.easyexample.android.express.ZegoMediaOptions;
 import im.zego.zegoexpress.callback.IZegoRoomLoginCallback;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
 import im.zego.zegoexpress.entity.ZegoUser;

@@ -1,6 +1,5 @@
 <resources>
-  <string name="app_name">ExpressSample</string>
-  <string name="title_activity_login">LoginActivity</string>
+  <string name="app_name">EasyExample</string>
   <string name="prompt_username">UserName</string>
   <string name="prompt_roomid">RoomID</string>
   <string name="action_sign_in">Sign in </string>
