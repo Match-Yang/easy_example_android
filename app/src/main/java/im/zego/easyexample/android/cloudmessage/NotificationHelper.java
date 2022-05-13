@@ -61,9 +61,6 @@ public class NotificationHelper {
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
             .setContentIntent(pendingIntent)
-//            .setVibrate(vibratePattern)
-//            .setSound(ringtoneUri)
-//            .setDefaults(Notification.FLAG_INSISTENT)
             .setAutoCancel(true)
             .build();
 
@@ -85,10 +82,6 @@ public class NotificationHelper {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
-//            AudioAttributes attributes = new AudioAttributes.Builder().build();
-//            channel.setSound(ringtoneUri, attributes);
-//            channel.enableVibration(true);
-//            channel.setVibrationPattern(vibratePattern);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);

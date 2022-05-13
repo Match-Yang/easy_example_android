@@ -31,7 +31,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (ActivityUtils.getActivityList().isEmpty()) {
             NotificationHelper.showNotification(this, cloudMessage);
         }
-        RingtoneManager.playRingTone(this);
 
         mainHandler.post(new Runnable() {
             @Override
