@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import im.zego.easyexample.android.cloudmessage.CloudMessage;
 import java.io.IOException;
@@ -61,12 +60,7 @@ public class HttpClient {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     if (result != null) {
-                        mainHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                result.onResult(-1, e.getMessage());
-                            }
-                        });
+                        runOnUiThread(result, -1, e.getMessage());
                     }
                 }
 
@@ -74,21 +68,11 @@ public class HttpClient {
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     if (Objects.equals(response.body().string(), "ok")) {
                         if (result != null) {
-                            mainHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    result.onResult(0, "");
-                                }
-                            });
+                            runOnUiThread(result, 0, "");
                         }
                     } else {
                         if (result != null) {
-                            mainHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    result.onResult(-1, "");
-                                }
-                            });
+                            runOnUiThread(result, -1, "");
                         }
                     }
                 }
@@ -106,12 +90,7 @@ public class HttpClient {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if (result != null) {
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            result.onResult(-1, e.getMessage());
-                        }
-                    });
+                    runOnUiThread(result, -1, e.getMessage());
 
                 }
             }
@@ -124,22 +103,12 @@ public class HttpClient {
                     int errorCode = jsonObject.getInt("ret");
                     String message = jsonObject.getString("message");
                     if (result != null) {
-                        mainHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                result.onResult(errorCode, message);
-                            }
-                        });
+                        runOnUiThread(result, errorCode, message);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     if (result != null) {
-                        mainHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                result.onResult(-1, "");
-                            }
-                        });
+                        runOnUiThread(result, -1, "");
                     }
                 }
             }
@@ -155,12 +124,7 @@ public class HttpClient {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if (result != null) {
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            result.onResult(-1, e.getMessage());
-                        }
-                    });
+                    runOnUiThread(result, -1, e.getMessage());
                 }
             }
 
@@ -172,40 +136,33 @@ public class HttpClient {
                     String token = jsonObject.getString("token");
                     if (!TextUtils.isEmpty(token)) {
                         if (result != null) {
-                            mainHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    result.onResult(0, token);
-                                }
-                            });
+                            runOnUiThread(result, 0, token);
                         }
                     } else {
                         if (result != null) {
-                            mainHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    result.onResult(-1, "");
-                                }
-                            });
+                            runOnUiThread(result, -1, "");
                         }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     if (result != null) {
-                        mainHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                result.onResult(-1, "");
-                            }
-                        });
+                        runOnUiThread(result, -1, "");
                     }
                 }
             }
         });
     }
 
+    private void runOnUiThread(HttpResult result, int errorCode, String response) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                result.onResult(errorCode, response);
+            }
+        });
+    }
+
     private void post(String url, String json, Callback callback) {
-        Log.d(TAG, "post() called with: url = [" + url + "], json = [" + json + "], callback = [" + callback + "]");
         RequestBody body = RequestBody.create(json, JSON);
         Request request = new Request.Builder()
             .url(url)
