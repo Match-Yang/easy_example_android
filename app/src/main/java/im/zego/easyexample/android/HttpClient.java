@@ -1,6 +1,8 @@
 package im.zego.easyexample.android;
 
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -43,6 +45,7 @@ public class HttpClient {
 
     public static final MediaType JSON
         = MediaType.get("application/json; charset=utf-8");
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     String baseUrl = "https://easy-example-call.herokuapp.com";
 
@@ -58,7 +61,12 @@ public class HttpClient {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     if (result != null) {
-                        result.onResult(-1, e.getMessage());
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                result.onResult(-1, e.getMessage());
+                            }
+                        });
                     }
                 }
 
@@ -66,11 +74,21 @@ public class HttpClient {
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     if (Objects.equals(response.body().string(), "ok")) {
                         if (result != null) {
-                            result.onResult(0, "");
+                            mainHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    result.onResult(0, "");
+                                }
+                            });
                         }
                     } else {
                         if (result != null) {
-                            result.onResult(-1, "");
+                            mainHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    result.onResult(-1, "");
+                                }
+                            });
                         }
                     }
                 }
@@ -88,7 +106,13 @@ public class HttpClient {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if (result != null) {
-                    result.onResult(-1, e.getMessage());
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            result.onResult(-1, e.getMessage());
+                        }
+                    });
+
                 }
             }
 
@@ -100,12 +124,22 @@ public class HttpClient {
                     int errorCode = jsonObject.getInt("ret");
                     String message = jsonObject.getString("message");
                     if (result != null) {
-                        result.onResult(errorCode, message);
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                result.onResult(errorCode, message);
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     if (result != null) {
-                        result.onResult(-1, "");
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                result.onResult(-1, "");
+                            }
+                        });
                     }
                 }
             }
@@ -121,7 +155,12 @@ public class HttpClient {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if (result != null) {
-                    result.onResult(-1, e.getMessage());
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            result.onResult(-1, e.getMessage());
+                        }
+                    });
                 }
             }
 
@@ -133,17 +172,32 @@ public class HttpClient {
                     String token = jsonObject.getString("token");
                     if (!TextUtils.isEmpty(token)) {
                         if (result != null) {
-                            result.onResult(0, token);
+                            mainHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    result.onResult(0, token);
+                                }
+                            });
                         }
                     } else {
                         if (result != null) {
-                            result.onResult(-1, "");
+                            mainHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    result.onResult(-1, "");
+                                }
+                            });
                         }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     if (result != null) {
-                        result.onResult(-1, "");
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                result.onResult(-1, "");
+                            }
+                        });
                     }
                 }
             }
