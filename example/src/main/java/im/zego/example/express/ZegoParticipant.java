@@ -1,4 +1,4 @@
-package im.zego.expresssample.express;
+package im.zego.example.express;
 
 import im.zego.zegoexpress.constants.ZegoStreamQualityLevel;
 

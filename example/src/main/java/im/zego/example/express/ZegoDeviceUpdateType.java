@@ -1,4 +1,4 @@
-package im.zego.expresssample.express;
+package im.zego.example.express;
 
 public enum ZegoDeviceUpdateType {
     cameraOpen,
