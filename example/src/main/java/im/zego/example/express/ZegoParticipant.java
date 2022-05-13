@@ -1,4 +1,4 @@
-package im.zego.easyexample.android.express;
+package im.zego.example.express;
 
 import im.zego.zegoexpress.constants.ZegoStreamQualityLevel;
 

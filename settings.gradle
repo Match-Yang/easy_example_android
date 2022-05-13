@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ExpressSample"
 include ':app'
+include ':example'

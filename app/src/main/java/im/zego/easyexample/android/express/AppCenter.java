@@ -8,6 +8,6 @@ public class AppCenter {
 
     // Get your ServerSecret from ZEGOCLOUD Console
     // [My Projects -> project's Edit -> Server Secret Keys] : https://console.zegocloud.com/project"
-    public static String serverSecret = ;
+    public static String serverSecret = "";
 
 }

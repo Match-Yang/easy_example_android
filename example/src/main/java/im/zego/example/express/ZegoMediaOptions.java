@@ -1,4 +1,4 @@
-package im.zego.easyexample.android.express;
+package im.zego.example.express;
 
 import androidx.annotation.IntDef;
 import java.lang.annotation.Retention;

@@ -6,35 +6,58 @@
   android:layout_height="match_parent">
 
   <LinearLayout
-    android:id="@+id/layout_login"
+    android:id="@+id/layout_self"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="96dp"
+    android:orientation="horizontal"
+    app:layout_constraintTop_toTopOf="parent">
 
     <EditText
-      android:id="@+id/username"
-      android:layout_width="match_parent"
+      android:id="@+id/self_user_id"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:layout_marginTop="96dp"
-      android:hint="@string/prompt_username"
-      android:inputType="textEmailAddress"
-      android:selectAllOnFocus="true" />
-
-    <EditText
-      android:id="@+id/roomid"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:hint="@string/prompt_roomid"
+      android:layout_marginStart="16dp"
+      android:layout_marginEnd="16dp"
+      android:layout_weight="1"
       android:selectAllOnFocus="true" />
 
     <Button
-      android:id="@+id/login"
-      android:layout_width="wrap_content"
+      android:id="@+id/self_register"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:layout_gravity="center_horizontal"
-      android:layout_marginTop="48dp"
-      android:text="@string/action_sign_in" />
+      android:layout_marginStart="16dp"
+      android:layout_marginEnd="16dp"
+      android:layout_weight="1"
+      android:text="register FCM Token" />
+  </LinearLayout>
+
+  <LinearLayout
+    android:id="@+id/layout_other"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="16dp"
+    app:layout_constraintTop_toBottomOf="@id/layout_self">
+
+    <EditText
+      android:id="@+id/target_user_id"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:layout_marginEnd="16dp"
+      android:layout_weight="1"
+      android:hint="target userID"
+      android:selectAllOnFocus="true" />
+
+    <Button
+      android:id="@+id/call_user"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:layout_marginEnd="16dp"
+      android:layout_weight="1"
+      android:text="Call User" />
   </LinearLayout>
 
   <ProgressBar
