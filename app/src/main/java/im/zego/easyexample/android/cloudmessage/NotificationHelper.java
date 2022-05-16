@@ -22,14 +22,9 @@ public class NotificationHelper {
     private static String CHANNEL_NAME = "invite_msg";
     private static String CHANNEL_DESC = "invite_msg";
     private static int notificationId = 9864;
-    private static long[] vibratePattern = {600, 600, 600, 600};
-    private static Uri ringtoneUri;
 
     public static void showNotification(Context context, CloudMessage cloudMessage) {
         Log.d(TAG, "showNotification() called with: cloudMessage = [" + cloudMessage + "]");
-        if (ringtoneUri == null) {
-            ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
-        }
         Class<?> cls = null;
         try {
             cls = Class.forName(ActivityUtils.getLauncherActivity());

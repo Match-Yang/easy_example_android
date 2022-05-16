@@ -48,6 +48,12 @@ public class HttpClient {
 
     String baseUrl = "https://easy-example-call.herokuapp.com";
 
+    /**
+     * register fcm token to server,bind userID with fcm token
+     * @param userID
+     * @param token
+     * @param result
+     */
     public void registerFCMToken(String userID, String token, HttpResult result) {
         try {
             Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
@@ -82,6 +88,11 @@ public class HttpClient {
         }
     }
 
+    /**
+     * this method will post message to server, and server send fcm message to target user.
+     * @param cloudMessage
+     * @param result  post result.
+     */
     public void callUserByCloudMessage(CloudMessage cloudMessage, HttpResult result) {
         Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
         builder.appendEncodedPath("call_invite");
@@ -91,7 +102,6 @@ public class HttpClient {
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 if (result != null) {
                     runOnUiThread(result, -1, e.getMessage());
-
                 }
             }
 
@@ -115,6 +125,11 @@ public class HttpClient {
         });
     }
 
+    /**
+     * get ZEGO express engine token from server,used to create/join room
+     * @param userID
+     * @param result
+     */
     public void getRTCToken(String userID, HttpResult result) {
         Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
         builder.appendPath("access_token");
