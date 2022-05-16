@@ -14,7 +14,7 @@ ZEGOCLOUD's easy example is a simple wrapper around our RTC product. You can ref
 
 ### Modify the project configurations
 ![](media/16496764650900/16496772462635.png)
-You need to modify `appID` and `serverSecret` to your own account, which can be obtained in the [ZEGO Admin Console](https://console.zegocloud.com/).
+You need to modify `appID` to your own account, which can be obtained in the [ZEGO Admin Console](https://console.zegocloud.com/).
 
 ### Run the sample code
 
@@ -29,7 +29,7 @@ You need to modify `appID` and `serverSecret` to your own account, which can be 
 ```groovy
 dependencies {
     // Import the zego express engine
-    implementation 'com.github.zegolibrary:express-video:2.17.1'
+    implementation 'com.github.zegolibrary:express-video:2.18.1'
 }
 ```
 2. In your setting.gradle file, add the jitpack maven .
@@ -47,27 +47,23 @@ dependencyResolutionManagement {
     }
 }
 ```
-3. to Run the app,you may need to process the dynamic permissions request.
-```xml
-  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.RECORD_AUDIO" />
-  <uses-permission android:name="android.permission.CAMERA" />
-  <uses-permission android:name="android.permission.BLUETOOTH" />
-  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
+### Import the source code module
+import the `:zegoexpress` module to your project
+![](media/16496764650900/import_module.png),choose the zegoexpress directory. 
+And add
+dependency in your app's build.gradle's dependencies:
+```groovy
+dependencies{
+   implementation project(':zegoexpress') 
+}
 ```
-declare them in xml and request `Manifest.permission.CAMERA` and `Manifest.permission.RECORD_AUDIO` in the runtime.
 
-### Copy the source code
-Copy the express directory to your project
-![](media/16496764650900/16496772462634.png)
+### generate and download google-services.json to app
+
 ### Method call
 The calling sequence of the SDK interface is as follows:
 createEngine --> joinRoom --> setLocalVideoView/setRemoteVideoView --> leaveRoom
+
 
 #### Create engine
 Before using the SDK function, you need to create the SDK first. We recommend creating it when the application starts. The sample code is as follows:
