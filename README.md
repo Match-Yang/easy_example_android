@@ -11,10 +11,44 @@ ZEGOCLOUD's easy example is a simple wrapper around our RTC product. You can ref
 
 ###  Clone the repository
 1. Clone the easy example Github repository. 
+2. Checkout to `call_invite` branch
+
+### Setup FCM
+
+1. Go to [Firebase Console](https://console.firebase.google.com/) and create new project if you don't have one.
+2. Andd new `Android` app to your Firebase project. Download the `google-service.json` file and  move it into your Android app module root directory.
+![](docs/images/fcm_android_json_file.jpg)
+3.  Add the google-services plugin as a dependency inside of your `/android/build.gradle` file:
+![](docs/images/google_service_dep.gif)
+```xml
+buildscript {
+  dependencies {
+    // ... other dependencies
+    classpath 'com.google.gms:google-services:4.3.10'
+    // Add me --- /\
+  }
+}
+```
+4. Execute the plugin by adding the following to your `/android/app/build.gradle` file:
+![](docs/images/google_service_dep_1.gif)
+```xml
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services' // <- Add this line
+```
 
 ### Modify the project configurations
-![](media/16496764650900/16496772462635.png)
-You need to modify `appID` to your own account, which can be obtained in the [ZEGO Admin Console](https://console.zegocloud.com/).
+![](docs/images/config_project.jpg)
+- You need to modify `appID` to your own account, which can be obtained in the [ZEGO Admin Console](https://console.zegocloud.com/).
+- You need to set `serverUrl` to a valid URL that can be obtained for Zego auth token and post FCM notification request.
+> We use Heroku for test backen service, you can deploy the token generation service by one simple click.
+>
+> [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs)
+>
+> Once deployed completed, you will get an url for your instance, try accessing `https://<heroku url>/access_token?uid=1234` to check if it works.
+> 
+> Check [easy_example_call_server_nodejs](https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs) for more details.
+> 
+> Note⚠️⚠️⚠️: There are some limitations for Heroku free account, please check this [Free Dyno Hours](https://devcenter.heroku.com/articles/free-dyno-hours) if you want to use Heroku for your production service.
 
 ### Run the sample code
 
@@ -22,43 +56,54 @@ You need to modify `appID` to your own account, which can be obtained in the [ZE
 
 2. Open Android Studio, select the Android device you are using,click the **Run 'app'** in the upper center to run the sample code and experience the Live Audio Room service.
 
-## Integrate the SDK into your own project
+## Integrate into your own project
 
 ### Introduce SDK
-1. declare the dependency for the ZegoExpressEngine Android library in your module (app-level) Gradle file (usually app/build.gradle).
-```groovy
-dependencies {
-    // Import the zego express engine
-    implementation 'com.github.zegolibrary:express-video:2.18.1'
-}
-```
-2. In your setting.gradle file, add the jitpack maven .
+
+In your `setting.gradle` file, add the jitpack maven .
 ``` groovy
-    pluginManagement {
+pluginManagement {
     repositories {
         
-        maven { url 'https://www.jitpack.io' }
+        maven { url 'https://www.jitpack.io' } // <- Add this line
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        maven { url 'https://www.jitpack.io' }
+        maven { url 'https://www.jitpack.io' } // <- Add this line
     }
 }
 ```
+
 ### Import the source code module
+
 import the `:zegoexpress` module to your project
-![](media/16496764650900/import_module.png),choose the zegoexpress directory. 
+![](docs/images/import_zegoexpress_module.jpg)
+
+Choose the `zegoexpress` directory. 
 And add
 dependency in your app's build.gradle's dependencies:
+![](docs/images/zegoexpress_module.gif)
 ```groovy
 dependencies{
    implementation project(':zegoexpress') 
 }
 ```
 
-### generate and download google-services.json to app
+### Setup FCM
+Same as [getting started section](#setup-fcm).
+
+### Setup backend service
+1. Generate `Firebase Admin SDK Private Key`
+
+![Generate Key](docs/images/fcm_admin_sdk_key.gif)
+2. Click this deploy button to start deploy your service:
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs)
+
+If you are using [Firebase Cloud Functions](https://firebase.google.com/docs/functions), check [this doc](https://firebase.google.com/docs/cloud-messaging/send-message#send-messages-to-specific-devices) for usage and check [this example code](https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs/blob/master/index.js) to make the FCM work with your project.
+
 
 ### Method call
 The calling sequence of the SDK interface is as follows:
@@ -66,58 +111,79 @@ createEngine --> joinRoom --> setLocalVideoView/setRemoteVideoView --> leaveRoom
 
 
 #### Create engine
-Before using the SDK function, you need to create the SDK first. We recommend creating it when the application starts. The sample code is as follows:
+
+Before using the SDK function, you need to create the instance of the SDK(Engine) first. We recommend creating it when the application starts. The sample code is as follows:
 ```java
  ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID);
 ```
 
 #### Join room
-When you want to communicate with audio and video, you need to call the join room interface first. According to your business scenario, you can set different audio and video controls through options, such as:
 
-1. call scene：[.autoPlayVideo, .autoPlayAudio, .publishLocalAudio, .publishLocalVideo]
-2. Live scene - host: [.autoPlayVideo, .autoPlayAudio, .publishLocalAudio, .publishLocalVideo]
-3. Live scene - audience:[.autoPlayVideo, .autoPlayAudio]
-4. Chat room - host:[.autoPlayAudio, .publishLocalAudio]
-5. Chat room - audience:[.autoPlayAudio]
+When you want to communicate with audio and video, you need to call the join room interface first. 
 
-The following sample code is an example of a call scenario:
+If you need to invite other to join the call, you can send the invitation at the same time while you join the room.
+
 ```java
-   private void joinRoom(Callback callback) {
-        String username = binding.username.getText().toString();
-        String roomid = binding.roomid.getText().toString();
-        String userID = System.currentTimeMillis() + "";
-        ZegoUser user = new ZegoUser(userID, username);
-        String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
-        int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
-            ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
-        ExpressManager.getInstance().joinRoom(roomid, user, token, mediaOptions, callback);
+binding.callUser.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        PermissionX.init(LoginActivity.this)
+            .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+            .request((allGranted, grantedList, deniedList) -> {
+                if (allGranted) {
+                    CloudMessage cloudMessage = new CloudMessage();
+                    cloudMessage.targetUserID = binding.targetUserId.getText().toString();
+                    cloudMessage.roomID = selfID;
+                    cloudMessage.callType = "Video";
+                    cloudMessage.callerUserID = selfID;
+                    cloudMessage.callerUserName = selfName;
+                    cloudMessage.callerIconUrl = selfIcon
+                    HttpClient.getInstance().callUserByCloudMessage(cloudMessage, new HttpResult() {
+                        @Override
+                        public void onResult(int errorCode, String result) {
+                            if (errorCode == 0) {
+                                joinRoom(cloudMessage.roomID, cloudMessage.callerUserID,
+                                    cloudMessage.callerUserName);
+                            } else {
+                                Toast.makeText(getApplication(), "callUserByCloudMessage failed:" + result,
+                                    Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+            });
     }
+});
 ```
 #### set video view
+
 If your project needs to use the video communication function, you need to set the View for displaying the video, call `setLocalVideoView` for the local video, and call `setRemoteVideoView` for the remote video.
 
 **setLocalVideoView:**
 ```java
-   ExpressManager.getInstance().setLocalVideoView(binding.localTexture);
+ExpressManager.getInstance().setLocalVideoView(binding.localTexture);
 ```
 
 **setLocalVideoView:**
 ```java
-    public void onRoomUserUpdate(String roomID, ZegoUpdateType updateType, ArrayList<ZegoUser> userList) {
-                if (updateType == ZegoUpdateType.ADD) {
-                    for (int i = 0; i < userList.size(); i++) {
-                        ZegoUser user = userList.get(i);
-                        TextureView remoteTexture = binding.remoteTexture;
-                        ExpressManager.getInstance().setRemoteVideoView(user.userID, remoteTexture);
-                    }
-                } else {
-                    
-                }
-            }
+@Override
+public void onRoomUserUpdate(String roomID, ZegoUpdateType updateType, ArrayList<ZegoUser> userList) {
+    if (updateType == ZegoUpdateType.ADD) {
+        for (int i = 0; i < userList.size(); i++) {
+            ZegoUser user = userList.get(i);
+            TextureView remoteTexture = binding.remoteTexture;
+            binding.remoteName.setText(user.userName);
+            setRemoteViewVisible(true);
+            ExpressManager.getInstance().setRemoteVideoView(user.userID, remoteTexture);
+        }
+    } else {
+        setRemoteViewVisible(false);
+    }
+}
 ```
 
 #### leave room
 When you want to leave the room, you can call the leaveroom interface.
 ```java
- ExpressManager.getInstance().leaveRoom();
+ExpressManager.getInstance().leaveRoom();
 ```

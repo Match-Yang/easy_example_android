@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import im.zego.easyexample.android.cloudmessage.CloudMessage;
 import java.io.IOException;
-import java.util.Objects;
 
 import im.zego.easyexample.android.express.AppCenter;
 import okhttp3.Call;
@@ -56,7 +55,7 @@ public class HttpClient {
      */
     public void registerFCMToken(String userID, String token, HttpResult result) {
         try {
-            Uri.Builder builder = Uri.parse(AppCenter.tokenUrl).buildUpon();
+            Uri.Builder builder = Uri.parse(AppCenter.serverUrl).buildUpon();
             builder.appendEncodedPath("store_fcm_token");
             String url = builder.build().toString();
             JSONObject jsonObject = new JSONObject();
@@ -94,7 +93,7 @@ public class HttpClient {
      * @param result  post result.
      */
     public void callUserByCloudMessage(CloudMessage cloudMessage, HttpResult result) {
-        Uri.Builder builder = Uri.parse(AppCenter.tokenUrl).buildUpon();
+        Uri.Builder builder = Uri.parse(AppCenter.serverUrl).buildUpon();
         builder.appendEncodedPath("call_invite");
         String url = builder.build().toString();
         post(url, cloudMessage.toJsonString(), new Callback() {
@@ -131,7 +130,7 @@ public class HttpClient {
      * @param result
      */
     public void getRTCToken(String userID, HttpResult result) {
-        Uri.Builder builder = Uri.parse(AppCenter.tokenUrl).buildUpon();
+        Uri.Builder builder = Uri.parse(AppCenter.serverUrl).buildUpon();
         builder.appendPath("access_token");
         builder.appendQueryParameter("uid", userID);
         String url = builder.build().toString();
