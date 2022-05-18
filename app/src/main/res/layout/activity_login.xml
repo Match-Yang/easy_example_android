@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:id="@+id/container"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
@@ -13,23 +14,23 @@
     android:orientation="horizontal"
     app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-      android:id="@+id/self_user_id"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_weight="1"
-      android:selectAllOnFocus="true" />
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Your ID:"
+        android:textAlignment="viewEnd" />
 
-    <Button
-      android:id="@+id/self_register"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_weight="1"
-      android:text="register FCM Token" />
+    <EditText
+        android:id="@+id/self_user_id"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:selectAllOnFocus="true" />
+
   </LinearLayout>
 
   <LinearLayout
@@ -40,24 +41,25 @@
     android:layout_marginTop="16dp"
     app:layout_constraintTop_toBottomOf="@id/layout_self">
 
-    <EditText
-      android:id="@+id/target_user_id"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_weight="1"
-      android:hint="target userID"
-      android:selectAllOnFocus="true" />
-
     <Button
-      android:id="@+id/call_user"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_weight="1"
-      android:text="Call User" />
+        android:id="@+id/call_user"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:text="Call User" />
+
+    <EditText
+        android:id="@+id/target_user_id"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:hint="Target User ID"
+        android:selectAllOnFocus="true" />
+
   </LinearLayout>
 
   <ProgressBar
@@ -72,4 +74,5 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

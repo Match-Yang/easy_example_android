@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import im.zego.easyexample.android.cloudmessage.CloudMessage;
 import java.io.IOException;
 import java.util.Objects;
+
+import im.zego.easyexample.android.express.AppCenter;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -46,8 +48,6 @@ public class HttpClient {
         = MediaType.get("application/json; charset=utf-8");
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    String baseUrl = "https://easy-example-call.herokuapp.com";
-
     /**
      * register fcm token to server,bind userID with fcm token
      * @param userID
@@ -56,7 +56,7 @@ public class HttpClient {
      */
     public void registerFCMToken(String userID, String token, HttpResult result) {
         try {
-            Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
+            Uri.Builder builder = Uri.parse(AppCenter.tokenUrl).buildUpon();
             builder.appendEncodedPath("store_fcm_token");
             String url = builder.build().toString();
             JSONObject jsonObject = new JSONObject();
@@ -72,7 +72,7 @@ public class HttpClient {
 
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (Objects.equals(response.body().string(), "ok")) {
+                    if (response.code() == 200) {
                         if (result != null) {
                             runOnUiThread(result, 0, "");
                         }
@@ -94,7 +94,7 @@ public class HttpClient {
      * @param result  post result.
      */
     public void callUserByCloudMessage(CloudMessage cloudMessage, HttpResult result) {
-        Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
+        Uri.Builder builder = Uri.parse(AppCenter.tokenUrl).buildUpon();
         builder.appendEncodedPath("call_invite");
         String url = builder.build().toString();
         post(url, cloudMessage.toJsonString(), new Callback() {
@@ -131,7 +131,7 @@ public class HttpClient {
      * @param result
      */
     public void getRTCToken(String userID, HttpResult result) {
-        Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
+        Uri.Builder builder = Uri.parse(AppCenter.tokenUrl).buildUpon();
         builder.appendPath("access_token");
         builder.appendQueryParameter("uid", userID);
         String url = builder.build().toString();
