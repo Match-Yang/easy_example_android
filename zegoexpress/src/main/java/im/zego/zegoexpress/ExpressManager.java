@@ -58,7 +58,7 @@ public class ExpressManager {
     public void createEngine(Application application, long appID) {
         ZegoEngineProfile profile = new ZegoEngineProfile();
         profile.appID = appID;
-        profile.scenario = ZegoScenario.COMMUNICATION;
+        profile.scenario = ZegoScenario.GENERAL;
         profile.application = application;
         ZegoEngineConfig config = new ZegoEngineConfig();
         ZegoExpressEngine.setEngineConfig(config);
