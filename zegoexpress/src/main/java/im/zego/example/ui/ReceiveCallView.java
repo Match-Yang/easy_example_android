@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.bumptech.glide.Glide;
 import im.zego.example.R;
 import im.zego.example.databinding.LayoutReceiveCallBinding;
 
@@ -84,6 +85,7 @@ public class ReceiveCallView extends FrameLayout {
         } else {
             binding.dialogCallType.setText(R.string.zego_video_call);
         }
+        Glide.with(getContext()).load(callData.callUserIcon).into(binding.dialogCallIcon);
     }
 
     public void setListener(OnReceiveCallViewClickedListener listener) {
