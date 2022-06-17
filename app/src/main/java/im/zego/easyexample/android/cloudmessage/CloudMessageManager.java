@@ -16,6 +16,10 @@ public class CloudMessageManager {
 
     private CloudMessageListener listener;
 
+    /**
+     * when set listener,should check if there is already cloudMessage
+     * @param listener
+     */
     public void setListener(CloudMessageListener listener) {
         this.listener = listener;
     }

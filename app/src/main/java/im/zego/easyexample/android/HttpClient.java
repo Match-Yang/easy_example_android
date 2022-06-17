@@ -61,6 +61,7 @@ public class HttpClient {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("userID", userID);
             jsonObject.put("token", token);
+            jsonObject.put("deviceType", "android");
             post(url, jsonObject.toString(), new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
