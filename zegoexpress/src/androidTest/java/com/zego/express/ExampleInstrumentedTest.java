@@ -1,4 +1,4 @@
-package im.zego.expresssample;
+package com.zego.express;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("im.zego.expresssample", appContext.getPackageName());
+        assertEquals("com.zego.express.test", appContext.getPackageName());
     }
 }

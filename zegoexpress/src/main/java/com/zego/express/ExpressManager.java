@@ -1,4 +1,4 @@
-package im.zego.expresssample.express;
+package com.zego.express;
 
 import android.app.Application;
 import android.text.TextUtils;
@@ -192,7 +192,8 @@ public class ExpressManager {
         });
     }
 
-    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions, IZegoRoomLoginCallback callback) {
+    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions,
+        IZegoRoomLoginCallback callback) {
         participantMap.clear();
         streamUserMap.clear();
         if (TextUtils.isEmpty(token)) {
@@ -339,14 +340,18 @@ public class ExpressManager {
         return localParticipant;
     }
 
+    public ZegoParticipant getParticipant(String userID) {
+        return participantMap.get(userID);
+    }
+
     public void setExpressHandler(ExpressManagerHandler handler) {
         this.handler = handler;
     }
 
     /**
-     * for security,token should be generated in server side,
-     * this method is only used for demo test,and may be deprecated in future update.
-     * https://docs.zegocloud.com/article/11649
+     * for security,token should be generated in server side, this method is only used for demo test,and may be
+     * deprecated in future update. https://docs.zegocloud.com/article/11649
+     *
      * @param userID
      * @param appID
      * @param serverSecret

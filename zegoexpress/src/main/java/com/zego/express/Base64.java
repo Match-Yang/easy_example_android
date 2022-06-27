@@ -23,7 +23,7 @@
  * questions.
  */
 
-package im.zego.expresssample.express;
+package com.zego.express;
 
 import android.os.Build;
 import androidx.annotation.RequiresApi;
