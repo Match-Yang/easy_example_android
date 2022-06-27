@@ -99,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * @param userID       if userID is empty,no render
-     * @param toFullView
-     * @param isLocalVideo
+     * @param toFullView   render to full texture or not
+     * @param isLocalVideo is self device's video or not
      */
     public void setRenderToView(String userID, boolean toFullView, boolean isLocalVideo) {
         Log.d(TAG, "setRenderToView() called with: userID = [" + userID + "], toFullView = [" + toFullView

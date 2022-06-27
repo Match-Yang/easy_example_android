@@ -297,7 +297,7 @@ public class ExpressManager {
         ZegoExpressEngine.getEngine().logoutRoom();
     }
 
-    public void playStream(String streamID, TextureView textureView) {
+    private void playStream(String streamID, TextureView textureView) {
         boolean autoPlayVideo = ZegoMediaOptions.autoPlayVideo(mediaOptions);
         boolean autoPlayAudio = ZegoMediaOptions.autoPlayAudio(mediaOptions);
         if (autoPlayAudio || autoPlayVideo) {
@@ -313,11 +313,11 @@ public class ExpressManager {
         }
     }
 
-    public void stopPlayStream(String streamID) {
+    private void stopPlayStream(String streamID) {
         ZegoExpressEngine.getEngine().stopPlayingStream(streamID);
     }
 
-    public String generateStreamID(String userID, String roomID) {
+    private String generateStreamID(String userID, String roomID) {
         if (TextUtils.isEmpty(userID)) {
             Log.d(TAG, "Error: [generateStreamID] userID is empty, please enter a right userID");
             return "";
