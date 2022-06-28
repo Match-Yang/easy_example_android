@@ -51,11 +51,11 @@ dependencyResolutionManagement {
 
 ### Import the source code module
 
-import the `:zegoexpress` module to your project
+1. import the `:zegoexpress` module to your project,Choose the `zegoexpress` directory. 
 ![](docs/images/import_zegoexpress_module.jpg)
 
-Choose the `zegoexpress` directory. 
-And add
+
+2. add
 dependency in your app's build.gradle's dependencies:
 ![](docs/images/zegoexpress_module.gif)
 ```groovy
