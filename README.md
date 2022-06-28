@@ -51,7 +51,7 @@ dependencyResolutionManagement {
 
 ### Import the source code module
 
-1. import the `:zegoexpress` module to your project,Choose the `zegoexpress` directory. 
+1. import the `:zegoexpress` module to your project,Choose the `:zegoexpress` directory. 
 ![](docs/images/import_zegoexpress_module.jpg)
 
 
