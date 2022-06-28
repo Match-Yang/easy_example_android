@@ -35,49 +35,35 @@ You need to modify `appID` and `serverSecret` to your own account, which can be 
 
 2. Open Android Studio, select the Android device you are using,click the **Run 'app'** in the upper center to run the sample code and experience the Live Audio Room service.
 
-## Integrate the SDK into your own project
+## Integrate into your own project
 
 ### Introduce SDK
-1. declare the dependency for the ZegoExpressEngine Android library in your module (app-level) Gradle file (usually app/build.gradle).
-```groovy
-dependencies {
-    // Import the zego express engine
-    implementation 'com.github.zegolibrary:express-video:2.17.1'
-}
-```
-2. In your setting.gradle file, add the jitpack maven .
+
+In your `setting.gradle` file, add the jitpack maven .
 ``` groovy
-    pluginManagement {
-    repositories {
-        
-        maven { url 'https://www.jitpack.io' }
-    }
-}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        maven { url 'https://www.jitpack.io' }
+        maven { url 'https://www.jitpack.io' } // <- Add this line
     }
 }
 ```
-3. to Run the app,you may need to process the dynamic permissions request.
-```xml
-  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.RECORD_AUDIO" />
-  <uses-permission android:name="android.permission.CAMERA" />
-  <uses-permission android:name="android.permission.BLUETOOTH" />
-  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
-```
-declare them in xml and request `Manifest.permission.CAMERA` and `Manifest.permission.RECORD_AUDIO` in the runtime.
 
-### Copy the source code
-Copy the express directory to your project
-![](media/16496764650900/16496772462634.png)
+### Import the source code module
+
+import the `:zegoexpress` module to your project
+![](docs/images/import_zegoexpress_module.jpg)
+
+Choose the `zegoexpress` directory. 
+And add
+dependency in your app's build.gradle's dependencies:
+![](docs/images/zegoexpress_module.gif)
+```groovy
+dependencies{
+   implementation project(':zegoexpress') 
+}
+```
+
 ### Method call
 The calling sequence of the SDK interface is as follows:
 createEngine --> joinRoom --> setLocalVideoView/setRemoteVideoView --> leaveRoom
