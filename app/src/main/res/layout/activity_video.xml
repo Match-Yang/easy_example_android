@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/container"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="#dddddd">
+
+  <FrameLayout
+    android:id="@+id/full_view_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextureView
+      android:id="@+id/full_view_texture"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
+    <TextView
+      android:id="@+id/full_view_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textColor="@color/white" />
+  </FrameLayout>
+
+  <FrameLayout
+    android:id="@+id/small_view_layout"
+    android:layout_width="180dp"
+    android:layout_height="240dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <TextureView
+      android:id="@+id/small_view_texture"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
+    <TextView
+      android:id="@+id/small_view_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textColor="@color/white" />
+  </FrameLayout>
+
+  <Button
+    android:id="@+id/logout_room"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="leave room"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
+
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/control_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toTopOf="@id/logout_room">
+
+    <ImageView
+      android:id="@+id/camera_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/selector_camera_button"
+      android:text="camera"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@+id/mic_btn"
+      app:layout_constraintHorizontal_bias="0.5"
+      app:layout_constraintHorizontal_chainStyle="spread"
+      app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+      android:id="@+id/mic_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/selector_mic_button"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@+id/switch_btn"
+      app:layout_constraintHorizontal_bias="0.5"
+      app:layout_constraintStart_toEndOf="@+id/camera_btn" />
+
+    <ImageView
+      android:id="@+id/switch_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/selector_switch_button"
+      android:text="switch"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.5"
+      app:layout_constraintStart_toEndOf="@+id/mic_btn" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
