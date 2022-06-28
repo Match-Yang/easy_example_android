@@ -15,6 +15,9 @@ import im.zego.zegoexpress.constants.ZegoUpdateType;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.util.ArrayList;
 
+/**
+ * activity show one-one video communicate
+ */
 public class VideoActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
