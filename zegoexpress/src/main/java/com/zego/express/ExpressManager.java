@@ -101,6 +101,8 @@ public class ExpressManager {
                         WeakReference<TextureView> weakReference = streamViewMap.get(zegoStream.streamID);
                         if (weakReference != null) {
                             playStream(zegoStream.streamID, weakReference.get());
+                        } else {
+                            playStream(zegoStream.streamID, null);
                         }
                     } else {
                         stopPlayStream(zegoStream.streamID);
@@ -283,6 +285,10 @@ public class ExpressManager {
     public void enableMic(boolean enable) {
         ZegoExpressEngine.getEngine().muteMicrophone(!enable);
         localParticipant.mic = !enable;
+    }
+
+    public void enableSpeaker(boolean enable) {
+        ZegoExpressEngine.getEngine().muteSpeaker(!enable);
     }
 
     public void switchFrontCamera(boolean front) {

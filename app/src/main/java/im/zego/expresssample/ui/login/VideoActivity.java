@@ -3,35 +3,28 @@ package im.zego.expresssample.ui.login;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.TextureView;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.zego.express.ExpressManager;
 import com.zego.express.ExpressManager.ExpressManagerHandler;
 import com.zego.express.ZegoDeviceUpdateType;
 import com.zego.express.ZegoParticipant;
-import im.zego.expresssample.databinding.ActivityMainBinding;
-import im.zego.zegoexpress.callback.IZegoRoomSetRoomExtraInfoCallback;
-import im.zego.zegoexpress.constants.ZegoRoomStateChangedReason;
+import im.zego.expresssample.databinding.ActivityVideoBinding;
 import im.zego.zegoexpress.constants.ZegoUpdateType;
-import im.zego.zegoexpress.entity.ZegoRoomExtraInfo;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.util.ArrayList;
-import java.util.Set;
-import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
+public class VideoActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private ActivityMainBinding binding;
+    private ActivityVideoBinding binding;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityVideoBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         ZegoParticipant localParticipant = ExpressManager.getInstance().getLocalParticipant();
         setRenderToView(localParticipant.userID, false, true);
@@ -40,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onBackPressed();
-                finish();
             }
         });
 

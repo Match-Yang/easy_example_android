@@ -31,44 +31,62 @@ public class LoginActivity extends AppCompatActivity {
         binding.username.setText(Build.MANUFACTURER);
         binding.roomid.setText("123765");
 
-        binding.login.setOnClickListener(new View.OnClickListener() {
+        initZEGOExpressSDK();
+
+        binding.loginVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!checkAppID()) {
-                    Toast.makeText(getApplication(),
-                        "please set your appID to AppCenter.java", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (!validateInput()) {
-                    Toast.makeText(getApplication(),
-                        "input cannot be null", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                PermissionX.init(LoginActivity.this)
-                    .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-                    .onExplainRequestReason((scope, deniedList) -> {
-                        scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions",
-                            "OK", "Cancel");
-                    })
-                    .request((allGranted, grantedList, deniedList) -> {
-                        if (allGranted) {
-                            int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
-                                ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
-                            String username = binding.username.getText().toString();
-                            String roomID = binding.roomid.getText().toString();
-                            joinRoom(roomID, username, mediaOptions, new IZegoRoomLoginCallback() {
-                                @Override
-                                public void onRoomLoginResult(int i, JSONObject jsonObject) {
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                                }
-                            });
-                        }
-                    });
+                onJoinButtonClicked(true);
             }
         });
 
-        initZEGOExpressSDK();
+        binding.loginAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onJoinButtonClicked(false);
+            }
+        });
+    }
+
+    private void onJoinButtonClicked(boolean video) {
+        if (!checkAppID()) {
+            Toast.makeText(getApplication(),
+                "please set your appID to AppCenter.java", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!validateInput()) {
+            Toast.makeText(getApplication(),
+                "input cannot be null", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        PermissionX.init(LoginActivity.this)
+            .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+            .onExplainRequestReason((scope, deniedList) -> {
+                scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions",
+                    "OK", "Cancel");
+            })
+            .request((allGranted, grantedList, deniedList) -> {
+                if (allGranted) {
+                    int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
+                        ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
+                    String username = binding.username.getText().toString();
+                    String roomID = binding.roomid.getText().toString();
+                    joinRoom(roomID, username, mediaOptions, new IZegoRoomLoginCallback() {
+                        @Override
+                        public void onRoomLoginResult(int errorCode, JSONObject jsonObject) {
+                            if (errorCode == 0) {
+                                Intent intent;
+                                if (video) {
+                                    intent = new Intent(LoginActivity.this, VideoActivity.class);
+                                } else {
+                                    intent = new Intent(LoginActivity.this, AudioActivity.class);
+                                }
+                                startActivity(intent);
+                            }
+                        }
+                    });
+                }
+            });
     }
 
     private void joinRoom(String roomID, String username, int mediaOptions, IZegoRoomLoginCallback callback) {
