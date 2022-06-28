@@ -13,6 +13,9 @@ import im.zego.zegoexpress.constants.ZegoUpdateType;
 import im.zego.zegoexpress.entity.ZegoUser;
 import java.util.ArrayList;
 
+/**
+ *  activity show one-one audio communicate
+ */
 public class AudioActivity extends AppCompatActivity {
 
     private ActivityAudioBinding binding;
