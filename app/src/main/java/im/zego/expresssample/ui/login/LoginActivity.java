@@ -29,7 +29,6 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.username.setText(Build.MANUFACTURER);
-        binding.roomid.setText("123765");
 
         initZEGOExpressSDK();
 
@@ -67,8 +66,14 @@ public class LoginActivity extends AppCompatActivity {
             })
             .request((allGranted, grantedList, deniedList) -> {
                 if (allGranted) {
-                    int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
-                        ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
+                    int mediaOptions;
+                    if (video) {
+                        mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
+                            ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
+                    } else {
+                        mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.publishLocalAudio;
+                    }
+
                     String username = binding.username.getText().toString();
                     String roomID = binding.roomid.getText().toString();
                     joinRoom(roomID, username, mediaOptions, new IZegoRoomLoginCallback() {

@@ -13,7 +13,9 @@
       android:id="@+id/username"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
+      android:layout_marginStart="32dp"
       android:layout_marginTop="96dp"
+      android:layout_marginEnd="32dp"
       android:hint="@string/prompt_username"
       android:inputType="textEmailAddress"
       android:selectAllOnFocus="true"
@@ -25,7 +27,9 @@
       android:id="@+id/roomid"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
+      android:layout_marginStart="32dp"
       android:layout_marginTop="8dp"
+      android:layout_marginEnd="32dp"
       android:hint="@string/prompt_roomid"
       android:selectAllOnFocus="true"
       app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +38,7 @@
 
     <Button
       android:id="@+id/login_video"
-      android:layout_width="wrap_content"
+      android:layout_width="256dp"
       android:layout_height="wrap_content"
       android:layout_gravity="start"
       android:text="@string/login_video"
@@ -42,11 +46,11 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/roomid"
-      app:layout_constraintVertical_bias="0.2" />
+      app:layout_constraintVertical_bias="0.15" />
 
     <Button
       android:id="@+id/login_audio"
-      android:layout_width="wrap_content"
+      android:layout_width="256dp"
       android:layout_height="wrap_content"
       android:layout_gravity="start"
       android:text="@string/login_audio"
@@ -54,7 +58,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/roomid"
-      app:layout_constraintVertical_bias="0.4" />
+      app:layout_constraintVertical_bias="0.3" />
 
     <ProgressBar
       android:id="@+id/loading"
