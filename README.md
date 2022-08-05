@@ -97,13 +97,12 @@ private void joinRoom(String roomID, boolean joinAsHost, IZegoRoomLoginCallback 
         String userID = System.currentTimeMillis() + "";
         String username = Build.MANUFACTURER + random.nextInt(2048);
         ZegoUser user = new ZegoUser(userID, username);
-        String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
         int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo;
         if (joinAsHost) {
             mediaOptions = mediaOptions |
                 ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
         }
-        ExpressManager.getInstance().joinRoom(roomID, user, token, mediaOptions, new IZegoRoomLoginCallback() {
+        ExpressManager.getInstance().joinRoom(roomID, user, mediaOptions, new IZegoRoomLoginCallback() {
             @Override
             public void onRoomLoginResult(int errorCode, JSONObject jsonObject) {
                 binding.loginLoading.setVisibility(View.GONE);
