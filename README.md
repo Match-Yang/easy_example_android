@@ -72,7 +72,7 @@ createEngine --> joinRoom --> setLocalVideoView/setRemoteVideoView --> leaveRoom
 #### Create engine
 Before using the SDK function, you need to create the SDK first. We recommend creating it when the application starts. The sample code is as follows:
 ```java
- ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID);
+ ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID,AppCenter.appSign);
 ```
 #### Request camera and audio Permission
 ```java
