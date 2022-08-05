@@ -71,7 +71,7 @@ createEngine --> joinRoom --> setLocalVideoView/setRemoteVideoView --> leaveRoom
 #### Create engine
 Before using the SDK function, you need to create the SDK first. We recommend creating it when the application starts. The sample code is as follows:
 ```java
- ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID);
+ ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID,AppCenter.appSign);
 ```
 
 #### Join room
@@ -90,10 +90,9 @@ The following sample code is an example of a call scenario:
         String roomid = binding.roomid.getText().toString();
         String userID = System.currentTimeMillis() + "";
         ZegoUser user = new ZegoUser(userID, username);
-        String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
         int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo |
             ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
-        ExpressManager.getInstance().joinRoom(roomid, user, token, mediaOptions, callback);
+        ExpressManager.getInstance().joinRoom(roomid, user, mediaOptions, callback);
     }
 ```
 #### set video view
