@@ -98,9 +98,8 @@ public class LoginActivity extends AppCompatActivity {
         binding.loading.setVisibility(View.VISIBLE);
         String userID = System.currentTimeMillis() + "";
         ZegoUser user = new ZegoUser(userID, username);
-        String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
 
-        ExpressManager.getInstance().joinRoom(roomID, user, token, mediaOptions, new IZegoRoomLoginCallback() {
+        ExpressManager.getInstance().joinRoom(roomID, user, mediaOptions, new IZegoRoomLoginCallback() {
             @Override
             public void onRoomLoginResult(int errorCode, JSONObject jsonObject) {
                 binding.loading.setVisibility(View.GONE);
@@ -116,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initZEGOExpressSDK() {
-        ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID);
+        ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID, AppCenter.appSign);
         PermissionX.init(this)
             .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
             .request((allGranted, grantedList, deniedList) -> {
@@ -128,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean checkAppID() {
-        return AppCenter.appID != 0L && !TextUtils.isEmpty(AppCenter.serverSecret);
+        return AppCenter.appID != 0L && !TextUtils.isEmpty(AppCenter.appSign);
     }
 
 }

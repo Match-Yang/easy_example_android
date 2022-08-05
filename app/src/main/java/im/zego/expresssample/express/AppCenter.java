@@ -7,7 +7,7 @@ public class AppCenter {
     public static long appID = ;
 
     // Get your ServerSecret from ZEGOCLOUD Console
-    // [My Projects -> project's Edit -> Server Secret Keys] : https://console.zegocloud.com/project"
-    public static String serverSecret = ;
+    // [My Projects -> project's Edit -> appSign] : https://console.zegocloud.com/project"
+    public static String appSign = ;
 
 }
