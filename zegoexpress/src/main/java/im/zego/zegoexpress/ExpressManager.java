@@ -55,9 +55,10 @@ public class ExpressManager {
     private String roomID;
     private ExpressManagerHandler handler;
 
-    public void createEngine(Application application, long appID) {
+    public void createEngine(Application application, long appID,String appSign) {
         ZegoEngineProfile profile = new ZegoEngineProfile();
         profile.appID = appID;
+        profile.appSign = appSign;
         profile.scenario = ZegoScenario.GENERAL;
         profile.application = application;
         ZegoEngineConfig config = new ZegoEngineConfig();
@@ -206,14 +207,10 @@ public class ExpressManager {
         });
     }
 
-    public void joinRoom(String roomID, ZegoUser zegoUser, String token, int mediaOptions,
+    public void joinRoom(String roomID, ZegoUser zegoUser , int mediaOptions,
         IZegoRoomLoginCallback callback) {
         participantMap.clear();
         streamUserMap.clear();
-        if (TextUtils.isEmpty(token)) {
-            Log.d(TAG, "Error: [joinRoom] token is empty, please enter a right token");
-            return;
-        }
         this.roomID = roomID;
         this.mediaOptions = mediaOptions;
         ZegoParticipant participant = new ZegoParticipant(zegoUser.userID, zegoUser.userName);
@@ -222,7 +219,6 @@ public class ExpressManager {
         participantMap.put(participant.userID, participant);
         streamUserMap.put(participant.streamID, participant);
         ZegoRoomConfig config = new ZegoRoomConfig();
-        config.token = token;
         // if you need limit participant count, you can change the max member count
         config.maxMemberCount = 0;
         config.isUserStatusNotify = true;
@@ -238,8 +234,7 @@ public class ExpressManager {
         boolean publishLocalAudio = ZegoMediaOptions.autoPublishLocalAudio(mediaOptions);
         boolean publishLocalVideo = ZegoMediaOptions.autoPublishLocalVideo(mediaOptions);
         Log.d(TAG, "joinRoom() called with: publishLocalAudio = [" + publishLocalAudio + "], publishLocalVideo = ["
-            + publishLocalVideo + "], token = [" + token
-            + "], mediaOptions = [" + mediaOptions + "], callback = [" + callback + "]");
+            + publishLocalVideo + "], mediaOptions = [" + mediaOptions + "], callback = [" + callback + "]");
         if (publishLocalAudio || publishLocalVideo) {
             startPublishStream(participant.streamID);
             ZegoExpressEngine.getEngine().enableCamera(publishLocalVideo);
@@ -412,24 +407,6 @@ public class ExpressManager {
 
     public void setExpressHandler(ExpressManagerHandler handler) {
         this.handler = handler;
-    }
-
-    /**
-     * for security,token should be generated in server side,
-     * this method is only used for demo test,and may be deprecated in future update.
-     * https://docs.zegocloud.com/article/11649
-     * @param userID
-     * @param appID
-     * @param serverSecret
-     * @return
-     */
-    public static String generateToken(String userID, long appID, String serverSecret) {
-        try {
-            return TokenServerAssistant.generateToken(appID, userID, serverSecret, 60 * 60 * 24).data;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     public void setRoomExtraInfo(String key, String value, IZegoRoomSetRoomExtraInfoCallback callback) {
