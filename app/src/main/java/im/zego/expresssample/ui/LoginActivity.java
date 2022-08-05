@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initZEGOExpressSDK() {
-        ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID);
+        ExpressManager.getInstance().createEngine(getApplication(), AppCenter.appID, AppCenter.appSign);
         PermissionX.init(this)
             .permissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
             .request((allGranted, grantedList, deniedList) -> {
@@ -88,13 +88,12 @@ public class LoginActivity extends AppCompatActivity {
         String userID = System.currentTimeMillis() + "";
         String username = Build.MANUFACTURER + random.nextInt(2048);
         ZegoUser user = new ZegoUser(userID, username);
-        String token = ExpressManager.generateToken(userID, AppCenter.appID, AppCenter.serverSecret);
         int mediaOptions = ZegoMediaOptions.autoPlayAudio | ZegoMediaOptions.autoPlayVideo;
         if (joinAsHost) {
             mediaOptions = mediaOptions |
                 ZegoMediaOptions.publishLocalAudio | ZegoMediaOptions.publishLocalVideo;
         }
-        ExpressManager.getInstance().joinRoom(roomID, user, token, mediaOptions, new IZegoRoomLoginCallback() {
+        ExpressManager.getInstance().joinRoom(roomID, user, mediaOptions, new IZegoRoomLoginCallback() {
             @Override
             public void onRoomLoginResult(int errorCode, JSONObject jsonObject) {
                 binding.loginLoading.setVisibility(View.GONE);
@@ -106,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean checkAppID() {
-        return AppCenter.appID != 0L && !TextUtils.isEmpty(AppCenter.serverSecret);
+        return AppCenter.appID != 0L && !TextUtils.isEmpty(AppCenter.appSign);
     }
 
     private boolean validateInput() {
