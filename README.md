@@ -53,15 +53,6 @@ apply plugin: 'com.google.gms.google-services' // <- Add this line
 ![](docs/images/config_project.jpg)
 - You need to modify `appID` to your own account, which can be obtained in the [ZEGO Admin Console](https://console.zegocloud.com/).
 - You need to set `serverUrl` to a valid URL that can be obtained for Zego auth token and post FCM notification request.
-> We use Heroku for test backen service, you can deploy the token generation service by one simple click.
->
-> [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs)
->
-> Once deployed completed, you will get an url for your instance, try accessing `https://<heroku url>/access_token?uid=1234` to check if it works.
-> 
-> Check [easy_example_call_server_nodejs](https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs) for more details.
-> 
-> Note⚠️⚠️⚠️: There are some limitations for Heroku free account, please check this [Free Dyno Hours](https://devcenter.heroku.com/articles/free-dyno-hours) if you want to use Heroku for your production service.
 
 ### Run the sample code
 
@@ -113,7 +104,7 @@ Same as [getting started section](#setup-fcm).
 ![Generate Key](docs/images/fcm_admin_sdk_key.gif)
 2. Click this deploy button to start deploy your service:
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FZEGOCLOUD%2Feasy_server_nextjs&env=ZEGOCLOUD_APP_ID,ZEGOCLOUD_SERVER_SECRET,FA_PROJECT_ID,FA_PRIVATE_KEY_ID,FA_PRIVATE_KEY,FA_CLIENT_EMAIL,FA_CLIENT_ID,FA_CLIENT_X509_CERT_URL)
 
 If you are using [Firebase Cloud Functions](https://firebase.google.com/docs/functions), check [this doc](https://firebase.google.com/docs/cloud-messaging/send-message#send-messages-to-specific-devices) for usage and check [this example code](https://github.com/ZEGOCLOUD/easy_example_call_server_nodejs/blob/master/index.js) to make the FCM work with your project.
 
@@ -200,3 +191,21 @@ When you want to leave the room, you can call the leaveroom interface.
 ```java
 ExpressManager.getInstance().leaveRoom();
 ```
+
+## How is call invitation works
+
+![](docs/images/firebase_send_call_invitation.png)
+
+1. Device A starts the App to obtain the FCM Token, sends a POST request to https://server/store_fcm_token, and stores the UserID_A and FCM Token on the Server.
+
+2. Device B starts the App to obtain the FCM Token, sends a POST request to https://server/store_fcm_token, and stores the UserID_B and FCM Token on the Server.
+
+3. The App on Device B is killed.
+
+4. Device A sends the call_invitation_data by sending an HTTP request to https://server/send_call_invitation, and calls the loginRoom and startPublishingStream methods of ZegoExpressEngin to start the call.
+
+5. The Server sends a message to Device B via the Firebase messaging.send interface.
+
+6. Device B receives the call_invitation_data via the public void onMessageReceived(@NonNull RemoteMessage remoteMessage) interface and pops up the phone call invitation dialog.
+
+7. After clicking the system notification box, Device B starts the App and uses the call_invitation_data to call the loginRoom and startPublishingStream methods of ZegoExpressEngin to start the call.

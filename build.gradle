@@ -11,7 +11,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
-        maven { url "https://jitpack.io" }
+        maven { url 'https://mvnrepository.com/artifact/com.github.gundy/semver4j' }
         google()
         mavenCentral()
     }
@@ -27,6 +27,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'https://mvnrepository.com/artifact/com.github.gundy/semver4j' }
         maven { url "https://jitpack.io" }
         google()
         mavenCentral()

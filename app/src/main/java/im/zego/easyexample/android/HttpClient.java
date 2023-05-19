@@ -95,7 +95,7 @@ public class HttpClient {
      */
     public void callUserByCloudMessage(CloudMessage cloudMessage, HttpResult result) {
         Uri.Builder builder = Uri.parse(AppCenter.serverUrl).buildUpon();
-        builder.appendEncodedPath("call_invite");
+        builder.appendEncodedPath("send_call_invitation");
         String url = builder.build().toString();
         post(url, cloudMessage.toJsonString(), new Callback() {
             @Override
@@ -132,8 +132,8 @@ public class HttpClient {
      */
     public void getRTCToken(String userID, HttpResult result) {
         Uri.Builder builder = Uri.parse(AppCenter.serverUrl).buildUpon();
-        builder.appendPath("access_token");
-        builder.appendQueryParameter("uid", userID);
+        builder.appendPath("get_access_token");
+        builder.appendQueryParameter("userID", userID);
         String url = builder.build().toString();
         get(url, new Callback() {
             @Override
